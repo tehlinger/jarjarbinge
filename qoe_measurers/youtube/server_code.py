@@ -1,24 +1,29 @@
-#Source : https://wiki.python.org/moin/BaseHttpServer
-
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import time
 from urllib import parse
-import pprint
-
-HOST_NAME="127.0.0.1"
-PORT_NUMBER=8000
+from pprint import pprint
 
 def page_write(s,message):
     s.wfile.write(message.encode('utf-8'))
 
 class MyHandler(BaseHTTPRequestHandler):
+
     def do_HEAD(s):
         s.send_response(200)
         s.send_header("Content-type","text/html")
         s.end_headers()
 
-    def do_GET(s):
+    def do_POST(s):
         """Response do a GET"""
+        content_length = int(s.headers['Content-Length'])
+        s.send_response(200)
+        s.send_header('Content-type', 'text/html')
+        s.end_headers()
+        post_data = s.rfile.read(content_length)
+        pprint(parse.parse_qs(post_data.decode('utf-8')))
+
+    def do_GET(s):
+        """Response do a POST"""
         s.send_response(200)
         s.send_header("Content-type","text/html")
         s.end_headers()
@@ -28,19 +33,3 @@ class MyHandler(BaseHTTPRequestHandler):
         args = parse.parse_qs(s.path)
         page_write(s,"<\br><p>ARGS : " +str(args)+"</br>")
         page_write(s,"</body></html>")
-
-def main():
-    server_class = HTTPServer
-    httpd = server_class((HOST_NAME, PORT_NUMBER), MyHandler)
-    print(str(time.asctime())+" Server Starts - %s:%s"%(HOST_NAME, PORT_NUMBER))
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("Server interrupted")
-        pass
-    httpd.server_close()
-    print(str(time.asctime())+"Server Stops - %s:%s" %\
-            (HOST_NAME, PORT_NUMBER))
-
-if __name__== "__main__":
-    main()
