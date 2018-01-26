@@ -1,0 +1,12 @@
+[
+	{
+		"service":"DEFAULT",
+		"bitrate_Kbps":"500",
+		"duration_ms":"100000"
+	},
+	{
+		"service":"DEFAULT",
+		"bitrate_Kbps":"1000",
+		"duration_ms":"200000"
+	}
+]
