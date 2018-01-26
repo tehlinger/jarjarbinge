@@ -2,9 +2,14 @@
 
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import time
+from urllib import parse
+import pprint
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER=8000
+
+def page_write(s,message):
+    s.wfile.write(message.encode('utf-8'))
 
 class MyHandler(BaseHTTPRequestHandler):
     def do_HEAD(s):
@@ -17,16 +22,12 @@ class MyHandler(BaseHTTPRequestHandler):
         s.send_response(200)
         s.send_header("Content-type","text/html")
         s.end_headers()
-        s.wfile.write("<html><head><title>Dummy server</title></head>"\
-                .encode('utf-8'))
-        s.wfile.write("<body><p>Dumb basic server</p>"\
-                .encode('utf-8'))
-        # If someone went to "http://something.somewhere.net/foo/bar/",
-        # then s.path equals "/foo/bar/".
-        s.wfile.write(("<p>You accessed path: </p>"+s.path)\
-                .encode('utf-8'))
-        s.wfile.write("</body></html>"
-                .encode('utf-8'))
+        page_write(s,"<html><head><title>Dummy server</title></head>")
+        page_write(s,"<body><p>Dumb basic server</p>")
+        page_write(s,("<\br><p>You accessed path: </p>"+s.path))
+        args = parse.parse_qs(s.path)
+        page_write(s,"<\br><p>ARGS : " +str(args)+"</br>")
+        page_write(s,"</body></html>")
 
 def main():
     server_class = HTTPServer
@@ -43,3 +44,4 @@ def main():
 
 if __name__== "__main__":
     main()
+
