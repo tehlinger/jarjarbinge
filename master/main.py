@@ -24,9 +24,11 @@ def main():
     while not_interrupted:
         try:
             for d in data:
-                r = requests.post("http://127.0.0.1:8000/",data=d)
+                r = requests.post("http://127.0.0.1:8001/",data=d)
                 if verbose:
                     print(r.status_code,r.reason)
+                time.sleep(30)
+                not_interrupted = True
         except KeyboardInterrupt:
             if verbose:
                 print("Interrupted")
@@ -34,7 +36,7 @@ def main():
         except (requests.exceptions.ConnectionError,ConnectionRefusedError):
             if verbose:
                 print("Unable to connect to QoE measurer. Retry in 2sec.")
-            time.sleep(2)
+        time.sleep(30)
 
 if __name__== "__main__":
     main()
