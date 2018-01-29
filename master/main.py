@@ -1,6 +1,8 @@
 import argparse
+import time
 import pprint
 import requests
+import urllib3
 
 from config_loader import *
 
@@ -29,6 +31,10 @@ def main():
             if verbose:
                 print("Interrupted")
             not_interrupted=False
+        except (requests.exceptions.ConnectionError,ConnectionRefusedError):
+            if verbose:
+                print("Unable to connect to QoE measurer. Retry in 2sec.")
+            time.sleep(2)
 
 if __name__== "__main__":
     main()
