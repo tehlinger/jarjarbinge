@@ -9,15 +9,28 @@ class TrafficController:
     #A dummy interface must be setup for the incoming traffic
     inc_if_is_up = False
 
-    def set_rate(tp_kb,is_incoming,burst_kb=None,limit_kb=None):
+    def set_rate(self,tp_kb,is_incoming,burst_kb=None,limit_kb=None):
         if not burst_kb:
             burst_kb = tp_kb
         if not limit_kb:
             limit_kb=burst_kb
+        interface = "ifb0" if is_incoming else self.in_if
+        cmd = static_commands.set_rate(interface,
+                tp_kb,burst_kb,limit_kb)
+        print(cmd)
+        if call(cmd) != 0:
+            raise OSError("Could not set rate to "+interface)
 
     def __init__(self,in_if="eth1",ip="138.96.195.67/32"):
         self.in_if = in_if
         self.ip = ip
+
+    def reset_all(self):
+        cmd = static_commands.clean_int_cmd(self.in_if)
+        call(cmd)
+        cmd = static_commands.clean_int_cmd("ifb0")
+        call(cmd)
+
 
     def reset_if_redir(self):
     #Deletes the redirection to dummy ingress interface

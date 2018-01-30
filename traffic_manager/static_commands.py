@@ -22,3 +22,14 @@ def revert_cmd(cmd):
     result[i] = "del"
     i = cmd.index("ffff:") + 1
     return result[:i]
+
+def set_rate(interface, tp_kb,burst_kb,limit_kb):
+    CMD_LIST = \
+            ["sudo", "tc", "qdisc", "add", "dev", interface, "root", "handle",
+                    "1:", "tbf", "rate", str(tp_kb)+"kbit", "burst",
+            str(burst_kb)+"kbit", "limit", str(limit_kb)+"kbit"]
+    return CMD_LIST
+
+def clean_int_cmd(interface):
+    CMD_LIST = ["tc", "qdisc", "del", "dev", interface, "root"]
+    return CMD_LIST
