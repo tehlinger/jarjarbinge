@@ -1,13 +1,22 @@
 from subprocess import call
 import static_commands
+from pprint import pprint
 
 class TrafficController:
     """
     Class responsible for modifying the traffic.
     """
-
     #A dummy interface must be setup for the incoming traffic
     inc_if_is_up = False
+    net_conditions = {
+            "ul_rat_kb":None,
+            "dl_rat_kb":None,
+            "ul_del_ms":None,
+            "dl_del_ms":None,
+            "ul_jit_ms":None,
+            "dl_jit_ms":None,
+            "ul_los":None,
+            "dl_los":None}
 
     def set_rate(self,tp_kb,is_incoming,burst_kb=None,limit_kb=None):
         if not burst_kb:
@@ -25,11 +34,24 @@ class TrafficController:
         self.in_if = in_if
         self.ip = ip
 
+    def set_conditions(self,cond_dict):
+        return
+
     def reset_all(self):
         cmd = static_commands.clean_int_cmd(self.in_if)
         call(cmd)
         cmd = static_commands.clean_int_cmd("ifb0")
         call(cmd)
+        TrafficController.net_conditions={
+            "ul_rat_kb":None,
+            "dl_rat_kb":None,
+            "ul_del_ms":None,
+            "dl_del_ms":None,
+            "ul_jit_ms":None,
+            "dl_jit_ms":None,
+            "ul_los":None,
+            "dl_los":None}
+        pprint(TrafficController.net_conditions)
 
 
     def reset_if_redir(self):
