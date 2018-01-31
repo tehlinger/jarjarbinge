@@ -31,7 +31,12 @@ def MakeHandlerClassFromArgv(init_args):
             self._set_headers()
             if QoSHandler.tc == None:
                QoSHandler.tc = TrafficController()
-            pprint.pprint(self.get_net_conditions())
+            received_net_cond = self.get_net_conditions()
+            pprint.pprint(received_net_cond)
+            TrafficController.net_conditions = received_net_cond
+            #The network conditions of the machine are chenged HERE
+            QoSHandler.tc.set_conditions()
+
 
         def get_net_conditions(self):
             """Converts all the values of the param_dict to floats"""

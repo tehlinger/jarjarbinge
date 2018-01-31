@@ -27,6 +27,8 @@ class TrafficController:
     def set_conditions(self):
         if not TrafficController.inc_if_is_up:
             self.set_up_dummy_inc_interface()
+        #Sometimes dict entries are missing. Must be added with 'None'
+        add_missing_conditions(TrafficController.net_conditions)
         tc_cmds = to_cmd_list(TrafficController.net_conditions)
         for cmd in tc_cmds:
             if call(cmd) != 0:
@@ -89,6 +91,13 @@ def cmd_to_string(s):
         r += i
         r += ' '
     return r
+
+def add_missing_conditions(net_conditions):
+    expected_entries = [ "ul_rat_kb", "dl_rat_kb", "ul_del_ms",\
+            "dl_del_ms", "ul_jit_ms", "dl_jit_ms", "ul_los", "dl_los"]
+    for e in expected_entries:
+        if e not in net_conditions:
+            TrafficController.net_conditions[e] = None
 
 if __name__ == '__main__':
     t = TrafficController()

@@ -22,6 +22,10 @@ def main():
     except KeyboardInterrupt:
         print("Server interrupted")
         pass
+    except Exception as e:
+        print("Error. Resetting network conditions")
+        HandlerClass.tc.reset_all()
+        print(e)
     HandlerClass.tc.reset_all()
     httpd.server_close()
     print(str(time.asctime())+"Server Stops - %s:%s" %\

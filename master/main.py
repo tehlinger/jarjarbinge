@@ -15,8 +15,8 @@ def get_args():
     return args
 
 TEST_QOS = \
-        {'dl_los': None, 'dl_del_ms': 50, 'ul_rat_kb': None,\
-        'ul_jit_ms': 5, 'ul_del_ms': None, 'dl_rat_kb': None,\
+        {'dl_los': None, 'dl_del_ms': 100, 'ul_rat_kb': None,\
+        'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': 50,\
         'dl_jit_ms': None, 'ul_los': None}
 
 def main():
