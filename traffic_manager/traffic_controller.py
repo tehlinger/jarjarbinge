@@ -71,14 +71,16 @@ class TrafficController:
             cmd = ["tc","qdisc","add","dev",self.out_if,"handle","ffff:",\
                     "ingress"]
             if call(cmd) != 0:
-                print("Try setting handle ffff: for ingress eth0 :")
+                print("Error : \n"+cmd_to_string(cmd))
                 #raise OSError(\
                 #        "Could not set ingress handle interface :"+self.out_if)
             cmd = link_if_to_dummy_cmd(self.out_if,self.ip)
             if call(cmd) != 0:
-                print(cmd_to_string(cmd))
                 raise OSError(\
-                        "Could not link dummy if to incoming interface :"+self.out_if)
+                        "Could not link dummy if to incoming interface:"\
+                        +cmd_to_str(cmd))
+            else:
+                print(cmd_to_string(cmd))
             TrafficController.inc_if_is_up = True
 
 def cmd_to_string(s):
@@ -92,7 +94,11 @@ if __name__ == '__main__':
     t = TrafficController()
     try:
         d = t.net_conditions
-        d['dl_rat_kb']=5000
+        #d['dl_rat_kb']=15000
+        #d['ul_rat_kb']=15000
+        d['dl_del_ms'] = 500
+        d['ul_del_ms'] = 500
+        #d['dl_jit_ms'] = 100
         t.net_conditions = d
         t.set_conditions()
         time.sleep(80)

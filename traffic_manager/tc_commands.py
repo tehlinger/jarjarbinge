@@ -121,7 +121,7 @@ def tbf_cmd(is_up,net_cond):
         else:
             rate  = net_cond["dl_rat_kb"]
         return result +\
-                ["rate",str(rate)+"kbit","burst","1kbit","limit","1mbit"]
+                ["rate",str(rate)+"kbit","burst","50kbit","limit","1mbit"]
     else:
         raise Exception('net_cond has no throuhput to implement')
 
