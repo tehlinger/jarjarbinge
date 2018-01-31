@@ -92,9 +92,7 @@ if __name__ == '__main__':
     t = TrafficController()
     try:
         d = t.net_conditions
-        d['ul_del_ms']=500
-        d['ul_jit_ms']=200
-        d['ul_los_ms']=20
+        d['dl_rat_kb']=5000
         t.net_conditions = d
         t.set_conditions()
         time.sleep(80)

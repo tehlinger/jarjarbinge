@@ -96,6 +96,18 @@ class TestDataLoad(unittest.TestCase):
         result = to_cmd_list(self.net_cond)
         self.assertEqual(expected,result)
 
+    def test_get_cmd_list_no_tbf_up(self):
+        self.net_cond['ul_los']   =50
+        self.net_cond['ul_jit_ms']=500
+        self.net_cond['ul_del_ms']=5000
+        expected = [
+                ['tc','qdisc','add','dev','eth1','root','handle','1:',
+                    'netem',
+                    'delay','5000ms','500ms','distribution','normal','loss','50%']
+                ]
+        result = to_cmd_list(self.net_cond)
+        self.assertEqual(expected,result)
+
     def test_get_cmd_list_no_netem(self):
         self.net_cond['ul_rat_kb']=5
         expected = [
