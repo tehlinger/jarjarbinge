@@ -1,6 +1,6 @@
 def get_link_cmd():
     return  ["tc", "filter", "add", "dev", "eth1", "parent", 
-            "ffff:", "u32", "match", "ip", "dst","138.96.195.167/32",
+            "ffff:", "u32", "match", "ip", "dst","138.96.195.67/32",
             "action", "mirred", "egress", "redirect", "dev", "ifb0"]
 
 
