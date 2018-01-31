@@ -1,6 +1,6 @@
 import unittest
 import pprint
-from static_commands import *
+from tc_commands import *
 from traffic_controller import *
 
 class TestDataLoad(unittest.TestCase):
@@ -78,6 +78,18 @@ class TestDataLoad(unittest.TestCase):
         self.net_cond['ul_del_ms']=5000
         expected = [
                 ['tc','qdisc','add','dev','eth1','root','handle','1:',
+                    'netem',
+                    'delay','5000ms','500ms','distribution','normal','loss','50%']
+                ]
+        result = to_cmd_list(self.net_cond)
+        self.assertEqual(expected,result)
+
+    def test_get_cmd_list_no_tbf_down(self):
+        self.net_cond['dl_los']   =50
+        self.net_cond['dl_jit_ms']=500
+        self.net_cond['dl_del_ms']=5000
+        expected = [
+                ['tc','qdisc','add','dev','ifb0','root','handle','1:',
                     'netem',
                     'delay','5000ms','500ms','distribution','normal','loss','50%']
                 ]

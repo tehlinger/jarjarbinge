@@ -70,7 +70,7 @@ def to_cmd_list(net_cond,out_if="eth1",in_if="ifb0"):
                         [child_handle_cmd(in_if)+netem_cmd(False,net_cond)]
         else:
                 cmd_list +=\
-                        [child_handle_cmd(in_if)+netem_cmd(False,net_cond)]
+                        [root_handle_cmd(in_if)+netem_cmd(False,net_cond)]
     return cmd_list
 
 def root_handle_cmd(interface):
