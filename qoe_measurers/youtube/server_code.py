@@ -13,7 +13,6 @@ def MakeHandlerClassFromArgv(init_args):
     Returns the class (class factory)
     Allows  to add instances var to the class
     """
-
     class MyHandler(BaseHTTPRequestHandler):
 
         never_launched = True
