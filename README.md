@@ -1,5 +1,5 @@
 # jarjarbinge
-Jar jar binge : a tool for measuring quality of experience of services while
+Jarjarbinge : a tool for measuring quality of experience of services while
 modifying network characteristics.
 
 Jarjarbinge has three parts, which will run 3 different HTTP servers :
