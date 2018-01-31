@@ -19,17 +19,6 @@ class TrafficController:
             "ul_los":None,
             "dl_los":None}
 
-    def set_rate(self,tp_kb,is_incoming,burst_kb=None,limit_kb=None):
-        if not burst_kb:
-            burst_kb = tp_kb
-        if not limit_kb:
-            limit_kb=burst_kb
-        interface = self.in_if if is_incoming else self.out_if
-        cmd = set_rate(interface,
-                tp_kb,burst_kb,limit_kb)
-        if call(cmd) != 0:
-            raise OSError("Could not set rate to "+interface)
-
     def __init__(self,out_if="eth1",in_if="ifb0",ip="138.96.195.67/32"):
         self.out_if = out_if
         self.in_if = in_if
