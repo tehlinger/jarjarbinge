@@ -2,6 +2,7 @@ LINK_D_ID_TO_ETH = ["tc", "filter", "add", "dev", "eth1", "parent",
         "ffff:", "u32", "match", "ip", "dst","138.96.195.167/32",
        "action", "mirred", "egress", "redirect", "dev", "ifb0"]
 
+
 def link_if_to_dummy_cmd(eth_id,ip=None):
     """
     Returns the formatted command to link ifb dummy command
@@ -34,13 +35,51 @@ def clean_int_cmd(interface):
     CMD_LIST = ["tc", "qdisc", "del", "dev", interface, "root"]
     return CMD_LIST
 
+def to_cmd_list(net_cond,out_if="eth1",in_if="ifb0"):
+    """
+    For a given net_cond dict (example of dict after), returns
+    the list of tc commands needed to setup the conditions.
+    If rate must be changed -> one command ('tbf')
+    If delay and/or jit and/or jit  must be changed -> one command ('netem')
+    Once for upload, and once for download.
+
+    Net_cond dictionnary :
+    {'ul_rat_kb': None, 'dl_rat_kb': None, 'ul_del_ms': None, 'dl_del_ms':
+    None, 'ul_jit_ms': None, 'dl_jit_ms': None, 'ul_los': None, 'dl_los': None}
+    """
+    cmd_list = []
+    has_up = is_up(net_cond)
+    has_down = is_down(net_cond)
+    if (not has_up) and (not has_down):
+        raise Exception('No command to extract from netcond : \n'+str(net_cond))
+    if has_up:
+        if has_tbf(net_cond,True):
+            cmd_list += [root_handle_cmd(out_if) + tbf_cmd(True,net_cond)]
+            if has_netem(net_cond,True):
+                cmd_list +=\
+                        [child_handle_cmd(out_if)+netem_cmd(True,net_cond)]
+        else:
+            cmd_list += \
+                    [root_handle_cmd(out_if)+netem_cmd(True,net_cond)]
+    if has_down:
+        if has_tbf(net_cond,False):
+            cmd_list += \
+                    [root_handle_cmd(in_if)+tbf_cmd(False,net_cond)]
+            if has_netem(net_cond,False):
+                cmd_list +=\
+                        [child_handle_cmd(in_if)+netem_cmd(False,net_cond)]
+        else:
+                cmd_list +=\
+                        [child_handle_cmd(in_if)+netem_cmd(False,net_cond)]
+    return cmd_list
+
 def root_handle_cmd(interface):
     return ["tc", "qdisc", "add", "dev", interface, "root", "handle", "1:"]
 
 def child_handle_cmd(interface):
     return ["tc", "qdisc", "add", "dev", interface, "parent", "1:1","handle", "10:"]
 
-def netem_cmd(interface,is_up,net_cond):
+def netem_cmd(is_up,net_cond):
     """
     Must be combined with the beginning of the cmd
     which is given by either 'child_handle_cmd' or
@@ -68,6 +107,23 @@ def netem_cmd(interface,is_up,net_cond):
     else:
         raise Exception('net_cond has no delay or loss to implement')
 
+def tbf_cmd(is_up,net_cond):
+    """
+    Must be combined with the beginning of the cmd
+    which is given by either 'child_handle_cmd' or
+    'root_handle_cmd'
+    """
+    if has_tbf(net_cond,is_up):
+        result = ["tbf"]
+        if is_up:
+            rate  = net_cond["ul_rat_kb"]
+        else:
+            rate  = net_cond["dl_rat_kb"]
+        return result +\
+                ["rate",str(rate)+"kbit","burst","1kbit","limit","1mbit"]
+    else:
+        raise Exception('net_cond has no throuhput to implement')
+
 def has_netem(net_cond,is_up):
     if is_up:
             return (net_cond["ul_del_ms"] != None or
@@ -75,3 +131,31 @@ def has_netem(net_cond,is_up):
     else:
         return (net_cond["dl_del_ms"] != None or
             net_cond["dl_los"] != None)
+
+def has_tbf(net_cond,is_up):
+    if is_up:
+        return net_cond["ul_rat_kb"] != None
+    else:
+        return net_cond["dl_rat_kb"] != None
+
+def is_up(net_cond):
+        return (net_cond["ul_rat_kb"] != None or
+                net_cond["ul_del_ms"] != None or
+                net_cond["ul_jit_ms"] != None or
+                net_cond["ul_los"] != None)
+
+def is_down(net_cond):
+        return (net_cond["dl_rat_kb"] != None or
+                net_cond["dl_del_ms"] != None or
+                net_cond["dl_jit_ms"] != None or
+                net_cond["dl_los"] != None)
+
+def match_not_empty(dic,s):
+    """
+    checks every key of the dic containing s
+    and returns true if one of these key is not empty
+    """
+    return
+    #for k in dic.keys():
+    ##TODO
+    #    if s in k
