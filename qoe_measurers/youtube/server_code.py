@@ -38,7 +38,6 @@ def MakeHandlerClassFromArgv(init_args):
                 if path=="/configureQoS":
                 #chrome extention waits for QoE to be modified
                 #before playing and modifiying the video
-                    #configNetworkQoS()
                     s.send_response(200)
                     s.send_header("Access-Control-Allow-Origin","*")
                     s.send_header("QoE","OK")

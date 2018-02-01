@@ -13,12 +13,12 @@ def MakeHandlerClassFromArgv(init_args):
     Returns the class (class factory)
     Allows  to add instances var to the class
     """
-    class QoSHandler(BaseHTTPRequestHandler):
+    class resultsHandler(BaseHTTPRequestHandler):
 
         tc = None
 
         def __init__(self,*args, **kwargs):
-            super(QoSHandler, self).__init__(*args, **kwargs)
+            super(resultsHandler, self).__init__(*args, **kwargs)
 
         def _set_headers(self):
                 self.send_response(200)
@@ -28,25 +28,17 @@ def MakeHandlerClassFromArgv(init_args):
 
         def do_POST(self):
             """Response do a POST"""
-            if QoSHandler.tc == None:
-               QoSHandler.tc = TrafficController()
+            if resultsHandler.tc == None:
+               resultsHandler.tc = TrafficController()
             received_net_cond = self.get_net_conditions()
             pprint.pprint(received_net_cond)
             TrafficController.net_conditions = received_net_cond
             #The network conditions of the machine are chenged HERE
-            QoSHandler.tc.set_conditions()
+            resultsHandler.tc.set_conditions()
             self.send_response(200)
             self.send_header("Content-type","application/json")
             self.end_headers()
             self.wfile.write('{"qos":"READY"}'.encode("utf-8"))
-
-
-        def get_net_conditions(self):
-            """Converts all the values of the param_dict to floats"""
-            cond_dict = self.get_params().copy()
-            for k in cond_dict.keys():
-                cond_dict[k] = float(cond_dict[k][0])
-            return cond_dict
 
         def get_params(self):
             content_length = int(self.headers['Content-Length'])
@@ -54,4 +46,4 @@ def MakeHandlerClassFromArgv(init_args):
             qos_params = parse.parse_qs(post_data.decode('utf-8'))
             return qos_params
 
-    return QoSHandler
+    return resultsHandler
