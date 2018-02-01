@@ -12,6 +12,7 @@ from config_loader import *
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
+RESULTS = "results/alpha.csv"
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -42,11 +43,13 @@ def main():
             r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
             HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
             try:
-                server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
+                results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
             except KeyboardInterrupt:
                 print("Server interrupted")
                 not_interrupted = False
                 pass
+            with open(RESULTS,"a") as f:
+                f.write(str(qos['dl_rat_kb'])+","+str(int(results['join_time'][0]))+","+str(int(results['QoE'][0]))+"\n")
         except KeyboardInterrupt:
             not_interrupted=False
 

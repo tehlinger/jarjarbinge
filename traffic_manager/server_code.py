@@ -39,7 +39,8 @@ def MakeHandlerClassFromArgv(init_args):
             self.send_header("Content-type","application/json")
             self.end_headers()
             self.wfile.write('{"qos":"READY"}'.encode("utf-8"))
-            print("Conditions set")
+            print("Conditions set : "+\
+                    str(TrafficController.net_conditions['dl_rat_kb'])+"kbps")
 
 
         def get_net_conditions(self):

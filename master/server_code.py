@@ -14,10 +14,14 @@ def get_qos():
             {'dl_los': None, 'dl_del_ms': 1, 'ul_rat_kb': None,\
             'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
             'dl_jit_ms': None, 'ul_los': None}
-    r = random.randint(0,15000)
+    r = random.randint(0,1)
+    if r == 1 :
+        r = random.randint(4000,30000)
+    else:
+        r = random.randint(1,4000)
     TEST_QOS['dl_rat_kb'] = r
     print("======")
-    print("DL RATE "+str(r)+"kbps")
+    print("DL RATE "+str(TEST_QOS['dl_rat_kb'])+"kbps")
     return TEST_QOS
 
 def MakeHandlerClassFromArgv(init_args):
@@ -28,6 +32,7 @@ def MakeHandlerClassFromArgv(init_args):
     class resultsHandler(BaseHTTPRequestHandler):
         must_not_stop = True
         qoe_data = None
+        results = None
 
         def __init__(self,*args, **kwargs):
             super(resultsHandler, self).__init__(*args, **kwargs)
@@ -48,6 +53,7 @@ def MakeHandlerClassFromArgv(init_args):
             self.send_header("Content-type","application/json")
             self.end_headers()
             resultsHandler.must_not_stop = False
+            resultsHandler.results = results
 
         def get_params(self):
             content_length = int(self.headers['Content-Length'])
@@ -74,3 +80,4 @@ class StoppableHttpServer(HTTPServer):
         httpd = server_class(server_address, handler_class)
         while handler_class.must_not_stop:
             httpd.handle_request()
+        return handler_class.results
