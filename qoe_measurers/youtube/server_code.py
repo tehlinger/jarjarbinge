@@ -26,6 +26,14 @@ def MakeHandlerClassFromArgv(init_args):
                 s.send_header("Content-type","text/html")
                 s.end_headers()
             else:
+                if path == '/go':
+                    s.send_response(200)
+                    s.send_header("Content-type","text/html")
+                    s.end_headers()
+                    if MyHandler.never_launched:
+                        print("Launching experiment...")
+                        launch_experiment(s.get_params())
+                        MyHandler.never_launched = False
                 if path =="/getVideoID_Res":
                 #chrome extension (client) wants data
                 #on the video he must play
@@ -47,15 +55,15 @@ def MakeHandlerClassFromArgv(init_args):
                     s.send_header("Access-Control-Allow-Origin","*")
                     s.send_header("QoE","OK")
                     s.end_headers()
-                    pprint.pprint(s.get_params())
+                    #pprint.pprint(s.get_params())
 
 
         def do_POST(s):
             """Response do a POST"""
             s.do_HEAD(s.path)
-            if MyHandler.never_launched:
-                launch_experiment(s.get_params())
-                MyHandler.never_launched = False
+            s.send_response(200)
+            s.send_header("Content-type","text/html")
+            s.end_headers()
 
         def do_GET(s):
             """Response do a GET"""

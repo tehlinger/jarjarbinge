@@ -31,7 +31,7 @@ def MakeHandlerClassFromArgv(init_args):
             if QoSHandler.tc == None:
                QoSHandler.tc = TrafficController()
             received_net_cond = self.get_net_conditions()
-            pprint.pprint(received_net_cond)
+            #pprint.pprint(received_net_cond)
             TrafficController.net_conditions = received_net_cond
             #The network conditions of the machine are chenged HERE
             QoSHandler.tc.set_conditions()
@@ -39,13 +39,17 @@ def MakeHandlerClassFromArgv(init_args):
             self.send_header("Content-type","application/json")
             self.end_headers()
             self.wfile.write('{"qos":"READY"}'.encode("utf-8"))
+            print("Conditions set")
 
 
         def get_net_conditions(self):
             """Converts all the values of the param_dict to floats"""
             cond_dict = self.get_params().copy()
             for k in cond_dict.keys():
-                cond_dict[k] = float(cond_dict[k][0])
+                if 'rat' in k:
+                    cond_dict[k] = int(cond_dict[k][0])
+                else:
+                    cond_dict[k] = float(cond_dict[k][0])
             return cond_dict
 
         def get_params(self):

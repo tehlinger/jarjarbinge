@@ -20,8 +20,6 @@ tmux send-keys "sleep 1 ; python3 main.py qoe_requests_files/default_list.json"
 tmux select-pane -t 1
 tmux send-keys "python3 main.py"
 tmux select-pane -t 2
-tmux send-keys "python3 main.py"
-tmux set synchronize-panes on
-tmux send-keys C-m
+tmux send-keys "sudo python3 main.py"
 
 tmux -2 attach-session -t $SESSION

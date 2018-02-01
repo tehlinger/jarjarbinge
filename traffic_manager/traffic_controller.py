@@ -32,9 +32,10 @@ class TrafficController:
         tc_cmds = to_cmd_list(TrafficController.net_conditions)
         for cmd in tc_cmds:
             if call(cmd) != 0:
-                raise OSError("Couldn't use tc command:n"+cmd_to_string(cmd))
-            else:
-                print(cmd_to_string(cmd))
+                #raise OSError("Couldn't use tc command:\n"+cmd_to_string(cmd))
+                print("Couldn't use tc command:\n"+cmd_to_string(cmd))
+            #else:
+                #print(cmd_to_string(cmd))
         return True
 
     def reset_all(self):
