@@ -30,6 +30,7 @@ def MakeHandlerClassFromArgv(init_args):
             """Response do a POST"""
             if QoSHandler.tc == None:
                QoSHandler.tc = TrafficController()
+            QoSHandler.tc.reset_all()
             received_net_cond = self.get_net_conditions()
             #pprint.pprint(received_net_cond)
             TrafficController.net_conditions = received_net_cond
@@ -40,7 +41,8 @@ def MakeHandlerClassFromArgv(init_args):
             self.end_headers()
             self.wfile.write('{"qos":"READY"}'.encode("utf-8"))
             print("Conditions set : "+\
-                    str(TrafficController.net_conditions['dl_rat_kb'])+"kbps")
+                    str(TrafficController.net_conditions['dl_rat_kb'])+"kbps, "+
+                    str(TrafficController.net_conditions['dl_los'])+"%")
 
 
         def get_net_conditions(self):

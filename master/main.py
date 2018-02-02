@@ -12,7 +12,7 @@ from config_loader import *
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/alpha.csv"
+RESULTS = "results/mix_los_rate.csv"
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -49,7 +49,14 @@ def main():
                 not_interrupted = False
                 pass
             with open(RESULTS,"a") as f:
-                f.write(str(qos['dl_rat_kb'])+","+str(int(results['join_time'][0]))+","+str(int(results['QoE'][0]))+"\n")
+                f.write(str(qos['dl_los'])+\
+                        ","+str(int(qos['dl_rat_kb']))+\
+                        ","+str(int(results['join_time'][0]))+\
+                        ","+str(int(results['QoE'][0]))+\
+                        ","+str(float(results['bufferSizeWhenStart'][0]))+\
+                        ","+str(float(results['getVideoLoadedFraction'][0]))+\
+                        ","+str(float(results['stallingNumber'][0]))+\
+                        "\n")
         except KeyboardInterrupt:
             not_interrupted=False
 
