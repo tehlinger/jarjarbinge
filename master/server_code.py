@@ -5,35 +5,11 @@ import pprint
 import requests
 import sys
 import random
+from qos_selector import *
 
 def page_write(self,message):
     self.wfile.write(message.encode('utf-8'))
 
-def get_qos():
-    TEST_QOS = \
-            {'dl_los': None, 'dl_del_ms': 0, 'ul_rat_kb': None,\
-            'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
-            'dl_jit_ms': None, 'ul_los': None}
-    r1= random.randint(1,3)
-    if r1== 1 :
-        r1= 0
-    if r1== 2:
-        r1= random.randint(100,800)/100
-    if r1== 3:
-         r1= random.randint(900,3000)/100
-    r = random.randint(1,3)
-    if r == 1 :
-        r = random.randint(10,800)
-    if r == 2:
-        r = random.randint(800,3000)
-    if r == 3:
-         r = random.randint(3000,30000)
-    TEST_QOS['dl_rat_kb'] = r
-    TEST_QOS['dl_los'] = r1
-    print("======")
-    print("DL RATE "+str(TEST_QOS['dl_rat_kb'])+"kbps")
-    print("LOSSES "+str(TEST_QOS['dl_los'])+"%")
-    return TEST_QOS
 
 def MakeHandlerClassFromArgv(init_args):
     """
