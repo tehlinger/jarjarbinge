@@ -13,7 +13,47 @@ from config_loader import *
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/useless.csv"
+RESULTS = "results/beta.csv"
+qos_metrics = \
+                ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms', 'ul_del_ms',
+                        'dl_rat_kb', 'dl_jit_ms', 'ul_los']
+qoe_metrics = \
+['QoE', 'availableQualityLevels', 'bufferSizeWhenStart', 'clen_audio',
+'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
+'player_load_time', 'resolution', 'stallingNumber', 'timeout',
+'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
+'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js']
+
+def header_line():
+    r = ""
+    for m in qos_metrics:
+        r+= m + ","
+    for m in qoe_metrics:
+        r+= m + ","
+    return r
+
+def line_out_of_dict(d,keys):
+    r = ""
+    for k in keys:
+        if k in d:
+            value = d[k]
+            if k == 'availableQualityLevels':
+                r += str(value[0].split(','))+','
+            else:
+                if value == None:
+                    value = ''
+                else:
+                    if type(value) is list and len(value) == 1\
+                            and ',' not in value:
+                        value = value[0]
+                    try:
+                        value  = float(value)
+                    except:
+                        value = value
+                r += str(value)+','
+        else:
+            r += ","
+    return r[:-1]
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -23,52 +63,53 @@ def get_args():
     args = parser.parse_args()
     return args
 
-
 def main():
     server_class = server_code.StoppableHttpServer
     args = get_args()
     verbose = args.verbose
     not_interrupted = True
-    qos_iterator = QosSelector(2).create_iterator()
+    qos_selector = QosSelector(3)
     while not_interrupted:
         try:
-            for qos in qos_iterator :
-                print("QOS : ")
-                pprint.pprint(qos)
-                r = requests.post("http://127.0.0.1:8002/",data=qos)
-                print("Sent QoS request")
-                qos_response  = r.content.decode('utf-8')
-                pprint.pprint(qos_response)
-                qos_response  = json.loads(r.content.decode('utf-8'))
-                if qos_response['qos'] == 'READY':
-                    print('QOS set.')
-                qoe_data = load_qoe_req(args.qoe_file)[0]
-                print("Sending QOE")
-                r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
-                HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
-                try:
-                    #Code to change the rate after a few seconds
-                    #time.sleep(5)
-                    #qos['dl_rat_kb'] = 1000
-                    #r = requests.post("http://127.0.0.1:8002/",data=qos)
-                    results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
-                except KeyboardInterrupt:
-                    print("Server interrupted")
-                    not_interrupted = False
-                    pass
-                with open(RESULTS,"a") as f:
-                    if qos != None:
-                        f.write(
-                                str(qos['dl_los'])+\
-                                ","+str((qos['dl_rat_kb']))+\
-                                #","+str(int(results['join_time'][0]))+\
-                                #","+str(int(results['QoE'][0]))+\
-                                #","+str(float(results['bufferSizeWhenStart'][0]))+\
-                                #","+str(float(results['getVideoLoadedFraction'][0]))+\
-                                #","+str(float(results['stallingNumber'][0]))+\
-                                "\n")
+            qos = qos_selector.random_point()
+            print("=================================")
+            print("QOS : ")
+            print(qos)
+            r = requests.post("http://127.0.0.1:8002/",data=qos)
+            print("Sent QoS request")
+            qos_response  = r.content.decode('utf-8')
+            qos_response  = json.loads(r.content.decode('utf-8'))
+            qoe_data = load_qoe_req(args.qoe_file)[0]
+            print("Sending QOE")
+            r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
+            HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
+            try:
+                #Code to change the rate after a few seconds
+                #time.sleep(5)
+                #qos['dl_rat_kb'] = 1000
+                #r = requests.post("http://127.0.0.1:8002/",data=qos)
+                results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
                 pprint.pprint(results)
+            except KeyboardInterrupt:
+                print("Server interrupted")
+                not_interrupted = False
+                pass
+            with open(RESULTS,"a") as f:
+                line =\
+                        line_out_of_dict(qos,qos_metrics)+','+\
+                        line_out_of_dict(results,qoe_metrics)+"\n"
+                f.write(line)
+                #if qos != None:
+                #    f.write(
+                #            str(qos['dl_los'])+\
+                #            ","+str((qos['dl_rat_kb']))+\
+                #            #","+str(int(results['join_time'][0]))+\
+                #            #","+str(int(results['QoE'][0]))+\
+                #            #","+str(float(results['bufferSizeWhenStart'][0]))+\
+                #            #","+str(float(results['getVideoLoadedFraction'][0]))+\
+                #            #","+str(float(results['stallingNumber'][0]))+\
+                #            "\n")
         except KeyboardInterrupt:
             not_interrupted=False
 

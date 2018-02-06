@@ -26,7 +26,6 @@ class QosSelector:
         return result
 
     def create_iterator(self):
-        ind = 0
         indexes = [list(range(0,self.pts_per_metric)) for i in range(0,8)]
         metrics = list(self.points.keys())
         #Builds every combination of the list of lists
@@ -42,6 +41,22 @@ class QosSelector:
                 result[metric] = value
             yield result
 
+    def random_point(self):
+        indexes = [list(range(0,self.pts_per_metric)) for i in range(0,8)]
+        metrics = list(self.points.keys())
+        #Builds every combination of the list of lists
+        products =  list(itertools.product(*indexes))
+        pts_conf = products[random.randint(0,len(products)-1)]
+        result = {}
+        #print(pts_conf)
+        for i in range(0,len(pts_conf)):
+            pt = pts_conf[i]
+            metric = metrics[i]
+            value = self.points[metric][pt]
+            if value == 0:
+                value = None
+            result[metric] = value
+        return result
 
 
 

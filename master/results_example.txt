@@ -17,3 +17,9 @@
  'ts_onYTIframeAPIReady': ['1517489129684'],
  'ts_startPlaying': ['1517489132523'],
  'ts_start_js': ['1517489129628']}
+
+['QoE', 'availableQualityLevels', 'bufferSizeWhenStart', 'clen_audio',
+'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
+'player_load_time', 'resolution', 'stallingNumber', 'timeout',
+'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
+'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js']
