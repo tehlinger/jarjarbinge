@@ -38,7 +38,7 @@ def line_out_of_dict(d,keys):
         if k in d:
             value = d[k]
             if k == 'availableQualityLevels':
-                r += str(value[0].split(','))+','
+                r += ','
             else:
                 if value == None:
                     value = ''

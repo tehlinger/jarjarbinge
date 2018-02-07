@@ -10,7 +10,7 @@ class QosSelector:
         self.sup_inf = \
                 {'dl_los': [0,50], 'dl_del_ms': [1,2000],
                         'ul_rat_kb': [0,2000], 'ul_jit_ms': [0,2000],
-                        'ul_del_ms': [0,2000], 'dl_rat_kb': [0,5000],
+                        'ul_del_ms': [1,2000], 'dl_rat_kb': [0,5000],
                         'dl_jit_ms': [0,2000], 'ul_los': [0,50]}
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
@@ -23,6 +23,15 @@ class QosSelector:
             n = self.pts_per_metric
             result[metric] = \
                     [i for i in range(inf,sup,int((sup-inf)/n))]
+        return result
+
+    def random_point(self):
+        result = {}
+        for k, sup_inf in self.sup_inf.items():
+            inf = sup_inf[0]
+            sup = sup_inf[1]
+            value = random.randint(inf,sup)
+            result[k] = value
         return result
 
     def create_iterator(self):
@@ -41,7 +50,7 @@ class QosSelector:
                 result[metric] = value
             yield result
 
-    def random_point(self):
+    def random_point_in_finite_space(self):
         indexes = [list(range(0,self.pts_per_metric)) for i in range(0,8)]
         metrics = list(self.points.keys())
         #Builds every combination of the list of lists

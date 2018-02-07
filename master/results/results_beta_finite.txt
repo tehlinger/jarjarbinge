@@ -1,0 +1,2 @@
+Slow PC : 04.07% valid (100/2457)
+Good PC : 13.57% valid (461/3396)
