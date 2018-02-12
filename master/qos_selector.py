@@ -8,10 +8,10 @@ class QosSelector:
                 'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
                 'dl_jit_ms': None, 'ul_los': None}
         self.sup_inf = \
-                {'dl_los': [0,50], 'dl_del_ms': [1,2000],
-                        'ul_rat_kb': [0,2000], 'ul_jit_ms': [0,2000],
-                        'ul_del_ms': [1,2000], 'dl_rat_kb': [0,5000],
-                        'dl_jit_ms': [0,2000], 'ul_los': [0,50]}
+                {'dl_los': [0,30], 'dl_del_ms': [1,3500],
+                        'ul_rat_kb': [0,8000], 'ul_jit_ms': [0,300],
+                    'ul_del_ms': [1,750], 'dl_rat_kb': [0,8000],
+                        'dl_jit_ms': [0,300], 'ul_los': [0,30]}
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
 
@@ -53,15 +53,11 @@ class QosSelector:
     def random_point_in_finite_space(self):
         indexes = [list(range(0,self.pts_per_metric)) for i in range(0,8)]
         metrics = list(self.points.keys())
-        #Builds every combination of the list of lists
-        products =  list(itertools.product(*indexes))
-        pts_conf = products[random.randint(0,len(products)-1)]
         result = {}
         #print(pts_conf)
-        for i in range(0,len(pts_conf)):
-            pt = pts_conf[i]
-            metric = metrics[i]
-            value = self.points[metric][pt]
+        for metric in metrics:
+            value = self.points[metric]\
+                    [random.randint(0,len(self.points[metric])-1)]
             if value == 0:
                 value = None
             result[metric] = value

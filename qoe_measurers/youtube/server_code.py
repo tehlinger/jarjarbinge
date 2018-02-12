@@ -40,7 +40,7 @@ def MakeHandlerClassFromArgv(init_args):
                     s.send_response(200)
                     s.send_header("Access-Control-Allow-Origin","*")
                     s.send_header("videoID","oFkulzWMotY")
-                    s.send_header("resolution","hd720")
+                    s.send_header("resolution","hd1080")
                     s.send_header("videoDuration","30")
                     s.end_headers()
                 if path=="/configureQoS":

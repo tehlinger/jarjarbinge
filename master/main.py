@@ -13,7 +13,7 @@ from config_loader import *
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/beta.csv"
+RESULTS = "results/grid_random_beta.csv"
 qos_metrics = \
                 ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms', 'ul_del_ms',
                         'dl_rat_kb', 'dl_jit_ms', 'ul_los']
@@ -22,7 +22,7 @@ qoe_metrics = \
 'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
 'player_load_time', 'resolution', 'stallingNumber', 'timeout',
 'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
-'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js']
+'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js','bitrate_switch']
 
 def header_line():
     r = ""
@@ -68,10 +68,10 @@ def main():
     args = get_args()
     verbose = args.verbose
     not_interrupted = True
-    qos_selector = QosSelector(3)
+    qos_selector = QosSelector(10)
     while not_interrupted:
         try:
-            qos = qos_selector.random_point()
+            qos = qos_selector.random_point_in_finite_space()
             print("=================================")
             print("QOS : ")
             print(qos)
@@ -112,6 +112,8 @@ def main():
                 #            "\n")
         except KeyboardInterrupt:
             not_interrupted=False
+        except Exception as e:
+            print("Got one error : "+str(e))
 
 if __name__== "__main__":
     main()
