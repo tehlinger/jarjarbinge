@@ -63,12 +63,15 @@ class Summary:
     def __str__(self):
         return "Played : " +str(self.nb_played)+"/"+str(len(self))
 
-    def show_grid(self):
+    def show_grid(self,res=None):
+        if res != None:
+            df = self.df[self.df.resolution == res]
+        else:
+            df = self.df
         cols = list(set(Summary.qos_metrics+["resolution"])\
                 -set(['ul_rat_kb','ul_jit_ms','dl_jit_ms']))
-        g = sns.PairGrid(self.df[cols],hue='resolution',despine=True)
-        g.map_lower(s.med_scat)
-        g.map_upper(plt.scatter,alpha=0.03)
+        g = sns.PairGrid(df[cols])
+        g.map_upper(plt.scatter)
         g.add_legend()
         plt.show()
 
@@ -97,7 +100,7 @@ class Summary:
                 #c = Summary.color_dic[res]
                 x = list(df[df[0] == color][x_metric])
                 y = list(df[df[0] == color][y_metric])
-                ax.scatter(x,y,color=mcolors.CSS4_COLORS[color])
+                ax.scatter(x,y,color=mcolors.CSS4_COLORS[color],s=80)
                 ax.set(xlabel=x_metric,ylabel=y_metric)
 
     def nice_grid(self):
@@ -116,9 +119,9 @@ class Summary:
                         #ax.set(xlabel=x,ylabel=y)
         #plt.subplots_adjust(left=None, bottom=None, right=None, top=None,
         #                        wspace=None, hspace=None)
-        blank_space = 0.15
-        #plt.subplots_adjust(hspace=blank_space,wspace=blank_space)
-        plt.tight_layout()
+        blank_space = 0.20
+        plt.subplots_adjust(hspace=0.27,wspace=blank_space)
+        #plt.tight_layout()
         plt.show()
 
 def proportion_res_df(df,col1,col2):
