@@ -40,10 +40,14 @@ class Summary:
                   'tiny'   : 'firebrick',
                   'dead'   : 'black'}
 
+    #color_list =\
+    #        ['black','red','red','red',
+    #        'yellow','yellow','yellow',
+    #        'green','green','green']
     color_list =\
-            ['black','red','red','red',
-            'yellow','yellow','yellow',
-            'green','green','green']
+            ['black','black','red','red',
+            'orange','orange','yellow',
+            'yellow','green','green']
     #color_list = ['black', 'grey', 'sienna', 'firebrick', 'red', 'orange',
     #'greenyellow','yellow', 'lightgreen', 'forestgreen','green']
 
@@ -93,8 +97,8 @@ class Summary:
                 ax.scatter(x,y,color=c)
                 ax.set(xlabel=x_metric,ylabel=y_metric)
 
-    def prop_scat(self,x_metric,y_metric,ax):
-        df = proportion_res_df(self.df,x_metric,y_metric)
+    def prop_scat(self,x_metric,y_metric,ax,min_meas):
+        df = proportion_res_df(self.df,x_metric,y_metric,min_meas)
         for color in df[0].unique():
             if color != 0:
                 #c = Summary.color_dic[res]
@@ -103,7 +107,7 @@ class Summary:
                 ax.scatter(x,y,color=mcolors.CSS4_COLORS[color],s=80)
                 ax.set(xlabel=x_metric,ylabel=y_metric)
 
-    def nice_grid(self):
+    def nice_grid(self,min_meas=0):
         cols = list(set(Summary.qos_metrics+["resolution"])\
                 -set(['ul_rat_kb','ul_jit_ms','dl_jit_ms','resolution']))
         width = len(cols)
@@ -115,7 +119,7 @@ class Summary:
                     y = cols.index(m2)
                     if x > y:
                         ax = axes[y][x-1]
-                        self.prop_scat(m1,m2,ax)
+                        self.prop_scat(m1,m2,ax,min_meas)
                         #ax.set(xlabel=x,ylabel=y)
         #plt.subplots_adjust(left=None, bottom=None, right=None, top=None,
         #                        wspace=None, hspace=None)
@@ -124,15 +128,23 @@ class Summary:
         #plt.tight_layout()
         plt.show()
 
-def proportion_res_df(df,col1,col2):
+def proportion_res_df(df,col1,col2,min_meas):
+    """
+    For a measures dataframe, gathers all the points having the same
+    value for col1 and col2 and applies a color depending on the pro-
+    portion of measures with resolution 'dead'.
+    """
     #df = df.loc[df.resolution != 'dead']
-    return \
-            df[[col1,col2,'resolution']].groupby([col1,col2]).apply(
+    result = df[[col1,col2,'resolution']].groupby([col1,col2]).apply(
                     lambda x : x[x['resolution'] != 'dead'].shape[0]/ \
                             x.shape[0])\
                             .dropna().apply(\
                             lambda x : Summary.color_list[math.floor(x * 10)])\
                             .reset_index()
+    result['nb_meas'] = df[[col1,col2,'resolution']].groupby([col1,col2]).apply(
+                    lambda x : x.shape[0])\
+                            .values
+    return result[result['nb_meas'] > min_meas]
 
 def med_res_df(df,col1,col2):
     #df = df.loc[df.resolution != 'dead']
