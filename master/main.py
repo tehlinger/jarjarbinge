@@ -1,4 +1,5 @@
 import argparse
+import random
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import json
 import time
@@ -72,6 +73,11 @@ def main():
     while not_interrupted:
         try:
             qos = qos_selector.random_point_in_finite_space()
+            #Following are line to get a static qos conf
+            #self.qos = \
+            #        {'dl_los': 1, 'dl_del_ms': 1, 'ul_rat_kb': None,\
+            #        'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
+            #        'dl_jit_ms': None, 'ul_los': None}
             print("=================================")
             print("QOS : ")
             print(qos)

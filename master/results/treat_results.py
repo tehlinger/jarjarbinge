@@ -1,4 +1,5 @@
 import pprint
+from matplotlib.lines import Line2D
 import math
 from matplotlib import colors as mcolors
 import pandas as pd
@@ -39,11 +40,12 @@ class Summary:
                   'small'  : 'red',
                   'tiny'   : 'firebrick',
                   'dead'   : 'black'}
-
+    #MANICHEAN GRID OF COLOR
     #color_list =\
-    #        ['black','red','red','red',
-    #        'yellow','yellow','yellow',
-    #        'green','green','green']
+    #        ['red','red','red','red','red',
+    #        'green','green','green','green','green']
+
+    #NON-MANICHEAN GRID
     color_list =\
             ['black','black','red','red',
             'orange','orange','yellow',
@@ -59,7 +61,10 @@ class Summary:
         self.df = pd.read_csv(measures_file)
         self.df = self.df.fillna(0)
         self.nb_played = self.df[self.df.join_time < 300000].resolution.size
-        self.df.loc[self.df.join_time > 300000,'resolution'] = "dead"
+        self.df.loc[(self.df.join_time > 300000) \
+                | ((self.df.ts_startPlaying == 0)
+                & (self.df.resolution == "hd1080"))\
+                ,'resolution']= "dead"
 
     def __len__(self):
         return self.df.shape[0]
@@ -124,9 +129,21 @@ class Summary:
         #plt.subplots_adjust(left=None, bottom=None, right=None, top=None,
         #                        wspace=None, hspace=None)
         blank_space = 0.20
-        plt.subplots_adjust(hspace=0.27,wspace=blank_space)
+        plt.subplots_adjust(hspace=0.57,wspace=blank_space)
+        custom_legend(axes[2][1])
         #plt.tight_layout()
         plt.show()
+
+def custom_legend(ax):
+    custom_lines = [\
+            Line2D([0], [0], color=mcolors.CSS4_COLORS['black'], lw=4),\
+            Line2D([0], [0], color=mcolors.CSS4_COLORS['red'], lw=4),\
+            Line2D([0], [0], color=mcolors.CSS4_COLORS['orange'], lw=4),\
+            Line2D([0], [0], color=mcolors.CSS4_COLORS['yellow'], lw=4),\
+            Line2D([0], [0], color=mcolors.CSS4_COLORS['green'], lw=4)]
+    ax.legend(custom_lines, \
+            ['<20 %', '<40 %', '<60 %','<80 %','<100 %'],
+            loc='center',title='Percentage of videos that could play :')
 
 def proportion_res_df(df,col1,col2,min_meas):
     """
