@@ -74,9 +74,10 @@ def main():
         try:
             qos = qos_selector.random_point_in_finite_space()
             #Following are line to get a static qos conf
-            #qos = QosSelector.get_clear_qos()
+            qos = QosSelector.get_clear_qos()
             print("=================================")
             print("QOS : ")
+            qos['dl_rat_kb'] = 200
             print(qos)
             r = requests.post("http://127.0.0.1:8002/",data=qos)
             print("Sent QoS request")
@@ -87,10 +88,12 @@ def main():
             r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
             HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
             try:
-                #Code to change the rate after a few seconds
-                time.sleep(5)
-                qos['dl_rat_kb'] = 1000
-                r = requests.post("http://127.0.0.1:8002/",data=qos)
+                time.sleep(1)
+                #360p
+                l = [(900,4),(50,6),(900,4),(100,2),(1000,0)]
+                #720p
+                #l = [(3000,3),(100,8),(3000,3),(100,8)]
+                play_scenar_list(l,qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
                 pprint.pprint(results)
@@ -98,25 +101,48 @@ def main():
                 print("Server interrupted")
                 not_interrupted = False
                 pass
+            not_interrupted = False
             with open(RESULTS,"a") as f:
                 line =\
                         line_out_of_dict(qos,qos_metrics)+','+\
                         line_out_of_dict(results,qoe_metrics)+"\n"
                 f.write(line)
-                #if qos != None:
-                #    f.write(
-                #            str(qos['dl_los'])+\
-                #            ","+str((qos['dl_rat_kb']))+\
-                #            #","+str(int(results['join_time'][0]))+\
-                #            #","+str(int(results['QoE'][0]))+\
-                #            #","+str(float(results['bufferSizeWhenStart'][0]))+\
-                #            #","+str(float(results['getVideoLoadedFraction'][0]))+\
-                #            #","+str(float(results['stallingNumber'][0]))+\
-                #            "\n")
         except KeyboardInterrupt:
             not_interrupted=False
-        except Exception as e:
-            print("Got one error : "+str(e))
+        #except Exception as e:
+        #    print("Got one error : "+str(e))
+
+def play_scenar_1(qos):
+    """
+    Functions for debugging. Will change the dl_rate
+    during specific interval to get youtube stalling
+    """
+    time.sleep(2)
+    qos['dl_rat_kb'] = 2800
+    r = requests.post("http://127.0.0.1:8002/",data=qos)
+    time.sleep(2)
+    qos['dl_rat_kb'] = 100
+    r = requests.post("http://127.0.0.1:8002/",data=qos)
+    time.sleep(6)
+    qos['dl_rat_kb'] = 3500
+    time.sleep(4)
+    r = requests.post("http://127.0.0.1:8002/",data=qos)
+    qos['dl_rat_kb'] = 100
+    r = requests.post("http://127.0.0.1:8002/",data=qos)
+    time.sleep(2)
+
+#Code to change the rate after a few seconds
+#time.sleep(1)
+#144p
+#l = [(400,4),(50,6),(400,6),(100,4),(1000,0)]
+#720p
+#l = [(3000,3),(100,8),(3000,3),(100,8)]
+#play_scenar_list(l,qos)
+def play_scenar_list(l,qos):
+    for (rate,sleep_time) in l:
+        qos['dl_rat_kb'] = rate
+        r = requests.post("http://127.0.0.1:8002/",data=qos)
+        time.sleep(sleep_time)
 
 if __name__== "__main__":
     main()
