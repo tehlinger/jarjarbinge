@@ -2,6 +2,12 @@ import random
 import itertools
 
 class QosSelector:
+
+    def get_clear_qos():
+        return  {'dl_los': 1, 'dl_del_ms': 1, 'ul_rat_kb': None,\
+                    'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
+                    'dl_jit_ms': None, 'ul_los': None}
+
     def __init__(self,pts_per_metric = 5):
         self.qos = \
                 {'dl_los': None, 'dl_del_ms': None, 'ul_rat_kb': None,\

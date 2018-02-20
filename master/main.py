@@ -74,10 +74,7 @@ def main():
         try:
             qos = qos_selector.random_point_in_finite_space()
             #Following are line to get a static qos conf
-            #self.qos = \
-            #        {'dl_los': 1, 'dl_del_ms': 1, 'ul_rat_kb': None,\
-            #        'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
-            #        'dl_jit_ms': None, 'ul_los': None}
+            #qos = QosSelector.get_clear_qos()
             print("=================================")
             print("QOS : ")
             print(qos)
@@ -91,9 +88,9 @@ def main():
             HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
             try:
                 #Code to change the rate after a few seconds
-                #time.sleep(5)
-                #qos['dl_rat_kb'] = 1000
-                #r = requests.post("http://127.0.0.1:8002/",data=qos)
+                time.sleep(5)
+                qos['dl_rat_kb'] = 1000
+                r = requests.post("http://127.0.0.1:8002/",data=qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
                 pprint.pprint(results)
