@@ -77,7 +77,6 @@ def main():
             qos = QosSelector.get_clear_qos()
             print("=================================")
             print("QOS : ")
-            qos['dl_rat_kb'] = 4300
             print(qos)
             r = requests.post("http://127.0.0.1:8002/",data=qos)
             print("Sent QoS request")
@@ -90,7 +89,7 @@ def main():
             try:
                 time.sleep(2)
                 l = [(200,0)]
-                play_scenar_list(l,qos)
+                #play_scenar_list(l,qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
                 pprint.pprint(results)
@@ -98,7 +97,6 @@ def main():
                 print("Server interrupted")
                 not_interrupted = False
                 pass
-            not_interrupted = False
             with open(RESULTS,"a") as f:
                 line =\
                         line_out_of_dict(qos,qos_metrics)+','+\

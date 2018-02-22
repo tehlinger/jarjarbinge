@@ -378,7 +378,7 @@ function skipVideo(){
             document.getElementById("demo").innerHTML = this.responseText;
             removeListeners();
             //window.close();
-            //location.reload();
+            location.reload();
         }
     };
 }
@@ -411,8 +411,8 @@ function sendVideoInfo(status){
         if (this.readyState == 4 ) {//&& this.status == 200
             document.getElementById("demo").innerHTML = this.responseText;
             removeListeners();
-            //location.reload();
-            //window.close();
+            location.reload();
+	    //window.close();
         }
     };
 }
