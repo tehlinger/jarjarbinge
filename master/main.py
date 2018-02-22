@@ -77,7 +77,7 @@ def main():
             qos = QosSelector.get_clear_qos()
             print("=================================")
             print("QOS : ")
-            qos['dl_rat_kb'] = 200
+            qos['dl_rat_kb'] = 4300
             print(qos)
             r = requests.post("http://127.0.0.1:8002/",data=qos)
             print("Sent QoS request")
@@ -88,11 +88,8 @@ def main():
             r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
             HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
             try:
-                time.sleep(1)
-                #360p
-                l = [(900,4),(50,6),(900,4),(100,2),(1000,0)]
-                #720p
-                #l = [(3000,3),(100,8),(3000,3),(100,8)]
+                time.sleep(2)
+                l = [(200,0)]
                 play_scenar_list(l,qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
@@ -135,6 +132,8 @@ def play_scenar_1(qos):
 #time.sleep(1)
 #144p
 #l = [(400,4),(50,6),(400,6),(100,4),(1000,0)]
+#360p
+#l = [(900,4),(50,6),(900,4),(100,2),(1000,0)]
 #720p
 #l = [(3000,3),(100,8),(3000,3),(100,8)]
 #play_scenar_list(l,qos)
