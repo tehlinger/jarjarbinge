@@ -11,6 +11,8 @@ from server_code import *
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER=8002
+SELF_IP="138.96.195.67/32"
+IN_IF="ifb0"
 
 def main():
     server_class = HTTPServer

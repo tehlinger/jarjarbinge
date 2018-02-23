@@ -1,8 +1,8 @@
 import time
 import os
-from pyautogui import click
 from subprocess import call
 
+CHROME_ID="ophdohnncbmfeikcgcjopnploippgbjk"
 CHROME_ID="mdaahbifddgcfhaibfkfpeiombojjfhe"
 
 

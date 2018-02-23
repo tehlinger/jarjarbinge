@@ -19,10 +19,11 @@ class TrafficController:
             "ul_los":None,
             "dl_los":None}
 
-    def __init__(self,out_if="eth1",in_if="ifb0",ip="138.96.195.67/32"):
-        self.out_if = out_if
-        self.in_if = in_if
-        self.ip = ip
+    def __init__(self):
+        self.in_if = "ifb0"
+        with open("conf","r") as f:
+            self.ip = f.readline()[:-1]
+            self.out_if = f.readline()[:-1]
 
     def set_conditions(self):
         if not TrafficController.inc_if_is_up:
