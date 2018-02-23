@@ -1,4 +1,7 @@
 from http.server import BaseHTTPRequestHandler,HTTPServer
+from pyautogui import click
+from pyautogui import moveRel
+from subprocess import call
 import time
 from urllib import parse
 from pprint import pprint
@@ -43,6 +46,22 @@ def MakeHandlerClassFromArgv(init_args):
                     s.send_header("resolution","hd1080")
                     s.send_header("videoDuration","30")
                     s.end_headers()
+                if path =="/click":
+                #chrome extension (client) wants data
+                #on the video he must play
+                    s.send_response(200)
+                    s.send_header("Access-Control-Allow-Origin","*")
+                    s.send_header("videoID","oFkulzWMotY")
+                    s.send_header("resolution","hd1080")
+                    s.send_header("videoDuration","30")
+                    s.end_headers()
+                    x = 150
+                    y = 150
+                    click(x,y,button='right')
+                    #time.sleep(1)
+                    moveRel(15,222)
+                    click()
+
                 if path=="/configureQoS":
                 #chrome extention waits for QoE to be modified
                 #before playing and modifiying the video

@@ -161,7 +161,6 @@ function configureQoSClient(){
 }
 function getVideo(){
     var xhttp = new XMLHttpRequest();
-
     xhttp.open("POST","http://localhost:8001/getVideoID_Res",true);
     xhttp.send();
 
@@ -221,13 +220,15 @@ ts_onYTIframeAPIReady=new Date().getTime()
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
     ts_onPlayerReadyEvent=new Date().getTime()
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST","http://localhost:8001/click");
+    xhttp.send();
     player_load_time=parseFloat(ts_onPlayerReadyEvent)-parseFloat(ts_start_js);
     document.getElementById("demo").innerHTML +="player_load_time="+player_load_time+"<br>"; //player.getAvailableQualityLevels()
     //event.target.loadVideoById(videoID, 0, "hd720")
     event.target.setPlaybackQuality("default");
     //event.target.setPlaybackQuality("hd720");
     //event.target.setPlaybackQuality("");
-    //configureQoSClient();
     player.playVideo();
     //event.target.playVideo();
 }
@@ -250,7 +251,6 @@ var date = new Date().getTime();
 document.getElementById("demo").innerHTML+=join_time+","+date+",event.data = "+event.data+"<br>";
 if (event.data == YT.PlayerState.PLAYING) {
 	document.getElementById("demo").innerHTML+="Playing "+player.getAvailableQualityLevels()+" "+player.getPlaybackQuality()+" "+"<br>";
-    //setTimeout(stopVideo, 6000);
 
 	availableQualityLevels=player.getAvailableQualityLevels();
 	if (availableQualityLevels.indexOf(resolution)==-1){

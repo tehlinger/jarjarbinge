@@ -54,11 +54,8 @@ class Summary:
     qos_metrics = ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms',
                'ul_del_ms','dl_rat_kb', 'dl_jit_ms', 'ul_los']
 
-    def __init__(self,df=None,files : 'str_list'=RESULT_FILES,header_file : 'file_path' = '../data/header.txt'):
-        if df is None:
-            self.df = load_csv(files,header_file)
-        else:
-            self.df = df
+    def __init__(self,files : 'str_list'=RESULT_FILES,header_file : 'file_path' = '../data/header.txt'):
+        self.df = load_csv(files,header_file)
         fill_nans(self.df)
         self.df = self.df.fillna(0)
         self.nb_played = self.df[self.df.join_time < 300000].resolution.size
@@ -72,13 +69,50 @@ class Summary:
     def __str__(self):
         return "Played : " +str(self.nb_played)+"/"+str(len(self))
 
-    def nice_grid(self,min_meas=0,ignore_dead=False):
-        """
-        Displays the grid of all the scatter plots (SP) for each pair of metric.
-        ignore_dead : the SP will not take in account the measure of videos
-        that did not play.
-        min_meas : the minimum of measure per point required to be displayed.
-        """
+    def show_grid(self,res=None):
+        if res != None:
+            df = self.df[self.df.resolution == res]
+        else:
+            df = self.df
+        cols = list(set(Summary.qos_metrics+["resolution"])\
+                -set(['ul_rat_kb','ul_jit_ms','dl_jit_ms']))
+        g = sns.PairGrid(df[cols])
+        g.map_upper(plt.scatter)
+        g.add_legend()
+        plt.show()
+
+    def simple_scat(self,x='dl_del_ms',y='dl_rat_kb'):
+        #sns.lmplot(data=self.df,x='dl_rat_kb',y='dl_del_ms',hue='resolution',
+        #        fit_reg=False)
+        g = sns.FacetGrid(self.df, col='resolution',hue='resolution')
+        g = g.map(plt.scatter, x="dl_del_ms",y  ='dl_rat_kb')
+        plt.show()
+
+    def med_scat(self,x_metric,y_metric,ax):
+        df = med_res_df(self.df,x_metric,y_metric)
+        for res in df.resolution.unique():
+            if res != 0:
+                #c = Summary.color_dic[res]
+                c = 'k'
+                x = list(df[df.resolution == res][x_metric])
+                y = list(df[df.resolution == res][y_metric])
+                ax.scatter(x,y,color=c)
+                ax.set(xlabel=x_metric,ylabel=y_metric)
+
+    def prop_scat(self,x_metric,y_metric,ax,min_meas,ignore_dead):
+        if not ignore_dead :
+            df = proportion_res_df(self.df,x_metric,y_metric,min_meas)
+        else:
+            df = find_point_with_duration(self.df,x_metric,y_metric,min_meas)
+        for color in df[0].unique():
+            if color != 0:
+                #c = Summary.color_dic[res]
+                x = list(df[df[0] == color][x_metric])
+                y = list(df[df[0] == color][y_metric])
+                ax.scatter(x,y,color=mcolors.CSS4_COLORS[color],s=60)
+                ax.set(xlabel=x_metric,ylabel=y_metric)
+
+    def nice_grid(self,min_meas=0,ignore_dead=False,res_to_count="dead"):
         cols = Summary.qos_metrics
         cols = list(set(Summary.qos_metrics+["resolution"])\
                 -set(['ul_rat_kb','ul_jit_ms','dl_jit_ms','resolution']))
@@ -101,22 +135,6 @@ class Summary:
         #plt.tight_layout()
         plt.show()
 
-    def prop_scat(self,x_metric,y_metric,ax,min_meas,ignore_dead):
-        """
-        Adds one scatter plot to the grid.
-        """
-        if not ignore_dead :
-            df = proportion_res_df(self.df,x_metric,y_metric,min_meas)
-        else:
-            df = display_points_matching_condition(self.df,x_metric,y_metric,min_meas)
-        for color in df[0].unique():
-            if color != 0:
-                #c = Summary.color_dic[res]
-                x = list(df[df[0] == color][x_metric])
-                y = list(df[df[0] == color][y_metric])
-                ax.scatter(x,y,color=mcolors.CSS4_COLORS[color],s=100)
-                ax.set(xlabel=x_metric,ylabel=y_metric)
-
 def custom_legend(ax):
     custom_lines = [\
             Line2D([0], [0], color=mcolors.CSS4_COLORS['black'], lw=4),\
@@ -130,23 +148,13 @@ def custom_legend(ax):
 
 
 def condition(x):
-    """
-    The condition that the displayed point will have to respect
-    for display_points_matching_condition
-    """
-    #return x[ (x['player_load_time'] < 5000 )]
-    #return x[ (x['join_time'] < 10000 )]
-    #return x[ (x['resolution'] == "tiny" ) & (x['totalStallDuration'] < 1)]
-    return x[(x['totalStallDuration'] < 1)]
+    return x[ (x['resolution'] == "tiny" ) & (x['totalStallDuration'] < 1)]
 
 def count_condition_per_group(x):
-    """
-    Uses the condition
-    """
     return condition(x).\
             shape[0]/x.shape[0]
 
-def display_points_matching_condition(df,col1,col2,min_meas,\
+def find_point_with_duration(df,col1,col2,min_meas,\
         func=count_condition_per_group):
     """
     Groups all the point of a scatterplot and applies the function func to it.
@@ -163,6 +171,9 @@ def display_points_matching_condition(df,col1,col2,min_meas,\
     final_res[0] = result
     final_res['nb_meas'] = final_res['QoE']
     return final_res[final_res['nb_meas'] > min_meas].reset_index()
+
+def group_function_count_720p(x):
+    return x[x['resolution']=='720p'].shape[0]/x.shape[0]
 
 def proportion_res_df(df,col1,col2,min_meas):
     """
