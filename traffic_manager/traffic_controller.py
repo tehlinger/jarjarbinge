@@ -20,10 +20,10 @@ class TrafficController:
             "dl_los":None}
 
     def __init__(self):
-        self.in_if = "ifb0"
+        self.out_if = "ifb0"
         with open("conf","r") as f:
             self.ip = f.readline()[:-1]
-            self.out_if = f.readline()[:-1]
+            self.in_if = f.readline()[:-1]
 
     def set_conditions(self):
         if not TrafficController.inc_if_is_up:
