@@ -75,6 +75,7 @@ def main():
             qos = qos_selector.random_point_in_finite_space()
             #Following are line to get a static qos conf
             qos = QosSelector.get_clear_qos()
+            qos['dl_rat_kb'] = 50000
             print("=================================")
             print("QOS : ")
             print(qos)
@@ -87,9 +88,9 @@ def main():
             r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
             HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
             try:
-                time.sleep(2)
-                l = [(200,0)]
-                #play_scenar_list(l,qos)
+                time.sleep(6)
+                l = [(400,4),(50,6),(400,6),(100,4),(1000,0)]
+                play_scenar_list(l,qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
                 pprint.pprint(results)

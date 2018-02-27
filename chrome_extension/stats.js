@@ -25,12 +25,13 @@ function send_res(r){
 //Extract the interesting data out of the "Stats for nerds"
 //HTML panel and puts it in a pretty dictionnary.
 function resolution_data(res_text,panel_html){
-		res_text = res_text.slice(res_text.indexOf("1"))
+		first_dig_index = res_text.indexOf(res_text.match(/\d/))
+		res_text = res_text.slice(first_dig_index)
 		res_values = res_text.replace(/\s+/g, '').split('/');
-		codecs_text = panel_html.children[4].textContent;
+		vid_aud_codec = panel_html.children[4].textContent.match(/\d+/g).map(Number);
 		return {"optimal_res":res_values[1],
 			"true_res":res_values[0],
-			"codecs":codecs_text}
+			"codecs":vid_aud_codec}
 }
 
 //Inspects the "Stats for nerds" panel HTML and returns
