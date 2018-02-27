@@ -36,7 +36,7 @@ def clean_int_cmd(interface):
     CMD_LIST = ["tc", "qdisc", "del", "dev", interface, "root"]
     return CMD_LIST
 
-def to_cmd_list(net_cond,out_if="eth1",in_if="ifb0"):
+def to_cmd_list(net_cond,out_if,in_if="ifb0"):
     """
     For a given net_cond dict (example of dict after), returns
     the list of tc commands needed to setup the conditions.

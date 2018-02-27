@@ -25,6 +25,17 @@ function json_bswitches_str(player){
 	return "{ts :"+player.getCurrentTime()+",quality:"+player.setPlaybackQuality()+"}";
 	}
 
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if (request.cmd == "new_res") {
+	    console.log(JSON.stringify(request.res));
+    } else {
+      //console.log("wrong cmd :"+request.cmd)
+      sendResponse({ result: "error", message: `Invalid 'cmd'` });
+    }
+    // Note: Returning true is required here!
+    return true;
+  });
 function addListeners() {
     //chrome.webRequest.onBeforeRequest.addListener(handleEvent, filters, ['requestBody']);
     chrome.webRequest.onSendHeaders.addListener(handleEvent, filters, ['requestHeaders']);
@@ -223,12 +234,28 @@ function onPlayerReady(event) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST","http://localhost:8001/click");
     xhttp.send();
+    stats_panel = document.querySelector(".html5-video-info-panel-content")
+    //Case where the panel is not there
+    if (stats_panel == null){
+	 //return null;
+    }
+    //res_values = stats_panel.children[2].children[1].textContent.replace(/\s+/g, '').split('/');
+//    try{
+//    		d = document.getElementById('player').contentWindow.document;
+//	   }
+//    catch(err){
+//	    console.log("Fail :/\n"+err.toString())
+//	    console.log(chrome.extension.getViews())
+//	   }
+    //console.log({'expected':res_values[1],'true_res':res_values[0]});
+
     player_load_time=parseFloat(ts_onPlayerReadyEvent)-parseFloat(ts_start_js);
     document.getElementById("demo").innerHTML +="player_load_time="+player_load_time+"<br>"; //player.getAvailableQualityLevels()
     //event.target.loadVideoById(videoID, 0, "hd720")
     event.target.setPlaybackQuality("default");
     //event.target.setPlaybackQuality("hd720");
-    //event.target.setPlaybackQuality("");
+
+
     player.playVideo();
     //event.target.playVideo();
 }
@@ -239,7 +266,6 @@ function onPlayerReady(event) {
 var done = false;
 var bufferingStart=0;
 var bufferSizeWhenStart="0";
-//THIBAUT : changement d'état de la vidéo
 function onPlaybackQualityChange(event){
 	bitrate_switch +=1;
 	bitrateSwitches.push(json_bswitches_str(player))

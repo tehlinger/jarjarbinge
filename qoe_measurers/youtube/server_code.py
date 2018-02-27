@@ -56,6 +56,7 @@ def MakeHandlerClassFromArgv(init_args):
                     s.send_header("videoDuration","30")
                     s.end_headers()
                     x = 150
+                    #x = 2150
                     y = 150
                     click(x,y,button='right')
                     #time.sleep(1)

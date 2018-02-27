@@ -30,7 +30,7 @@ class TrafficController:
             self.set_up_dummy_inc_interface()
         #Sometimes dict entries are missing. Must be added with 'None'
         add_missing_conditions(TrafficController.net_conditions)
-        tc_cmds = to_cmd_list(TrafficController.net_conditions)
+        tc_cmds = to_cmd_list(TrafficController.net_conditions,self.in_if)
         for cmd in tc_cmds:
             if call(cmd) != 0:
                 #raise OSError("Couldn't use tc command:\n"+cmd_to_string(cmd))
