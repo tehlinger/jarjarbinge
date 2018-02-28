@@ -1,5 +1,5 @@
 def get_link_cmd():
-    return  ["tc", "filter", "add", "dev", "eth1", "parent", 
+    return  ["tc", "filter", "add", "dev", None, "parent",
             "ffff:", "u32", "match", "ip", "dst","138.96.195.67/32",
             "action", "mirred", "egress", "redirect", "dev", "ifb0"]
 
@@ -36,7 +36,7 @@ def clean_int_cmd(interface):
     CMD_LIST = ["tc", "qdisc", "del", "dev", interface, "root"]
     return CMD_LIST
 
-def to_cmd_list(net_cond,out_if,in_if="ifb0"):
+def to_cmd_list(net_cond,out_if,in_if):
     """
     For a given net_cond dict (example of dict after), returns
     the list of tc commands needed to setup the conditions.
@@ -150,13 +150,3 @@ def is_down(net_cond):
                 net_cond["dl_del_ms"] != None or
                 net_cond["dl_jit_ms"] != None or
                 net_cond["dl_los"] != None)
-
-def match_not_empty(dic,s):
-    """
-    checks every key of the dic containing s
-    and returns true if one of these key is not empty
-    """
-    return
-    #for k in dic.keys():
-    ##TODO
-    #    if s in k

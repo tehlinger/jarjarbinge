@@ -1,4 +1,5 @@
 import argparse
+import pickle
 import random
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import json
@@ -75,7 +76,7 @@ def main():
             qos = qos_selector.random_point_in_finite_space()
             #Following are line to get a static qos conf
             qos = QosSelector.get_clear_qos()
-            qos['dl_rat_kb'] = 50000
+            qos['dl_rat_kb'] = 8000
             print("=================================")
             print("QOS : ")
             print(qos)
@@ -88,12 +89,13 @@ def main():
             r = requests.post("http://127.0.0.1:8001/go",data=qoe_data)
             HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
             try:
-                time.sleep(6)
-                l = [(400,4),(50,6),(400,6),(100,4),(1000,0)]
+                time.sleep(4)
+                l = [(100,9),(5750,3),(100,4),(4000,0)]
                 play_scenar_list(l,qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
-                pprint.pprint(results)
+                pprint.pprint(get_res_for_MOS(results))
+                dump_resolutions_to_pck(results)
             except KeyboardInterrupt:
                 print("Server interrupted")
                 not_interrupted = False
@@ -141,6 +143,22 @@ def play_scenar_list(l,qos):
         qos['dl_rat_kb'] = rate
         r = requests.post("http://127.0.0.1:8002/",data=qos)
         time.sleep(sleep_time)
+
+def dump_resolutions_to_pck(results):
+    test = get_res_for_MOS(results)
+    with open("res_example.pck","wb") as test_file:
+        pickle.dump(test,test_file)
+
+def get_res_for_MOS(results):
+    test = {}
+    if 'stallingInfo' in results.keys():
+        test['stalling'] = json.loads("["+results["stallingInfo"][0]+"]")
+    else:
+        test['stalling'] = []
+    test['resolutions'] =\
+            json.loads("["+str(results["true_resolutions"][0])+"]")
+    test['join_time'] = float(results['join_time'][0])
+    return test
 
 if __name__== "__main__":
     main()

@@ -20,23 +20,24 @@ class TrafficController:
             "dl_los":None}
 
     def __init__(self):
-        self.out_if = "ifb0"
+        self.in_if = "ifb0"
         with open("conf","r") as f:
             self.ip = f.readline()[:-1]
-            self.in_if = f.readline()[:-1]
+            self.out_if = f.readline()[:-1]
 
     def set_conditions(self):
         if not TrafficController.inc_if_is_up:
             self.set_up_dummy_inc_interface()
         #Sometimes dict entries are missing. Must be added with 'None'
         add_missing_conditions(TrafficController.net_conditions)
-        tc_cmds = to_cmd_list(TrafficController.net_conditions,self.in_if)
+        tc_cmds = to_cmd_list(TrafficController.net_conditions,self.out_if,self.in_if)
+        #pprint([cmd_to_string(i) for i in tc_cmds])
         for cmd in tc_cmds:
             if call(cmd) != 0:
                 #raise OSError("Couldn't use tc command:\n"+cmd_to_string(cmd))
                 print("Couldn't use tc command:\n"+cmd_to_string(cmd))
-            #else:
-                #print(cmd_to_string(cmd))
+            else:
+                print(cmd_to_string(cmd))
         return True
 
     def reset_all(self):
