@@ -16,12 +16,12 @@ from mos_p_1203 import get_itu_mos
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/grid_random_beta.csv"
+RESULTS = "results/test_beta.csv"
 qos_metrics = \
                 ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms', 'ul_del_ms',
                         'dl_rat_kb', 'dl_jit_ms', 'ul_los']
 qoe_metrics = \
-['QoE', 'availableQualityLevels', 'bufferSizeWhenStart', 'clen_audio',
+['ITU_mos','QoE', 'availableQualityLevels', 'bufferSizeWhenStart', 'clen_audio',
 'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
 'player_load_time', 'resolution', 'stallingNumber', 'timeout',
 'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
@@ -95,8 +95,22 @@ def main():
                 #play_scenar_list(l,qos)
                 results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
                 results["httpInfo"]=""
-                print("MOS : ")
-                pprint.pprint(get_itu_mos(get_res_for_MOS(results)))
+                print("===RES===")
+                pprint.pprint(results)
+                print("===MOS===")
+                dic_for_mos = get_res_for_MOS(results)
+                if dic_for_mos['resolutions'] is None or\
+                        len(dic_for_mos['resolutions']) == 0:
+                        print('Not launched')
+                else:
+                    try:
+                        mos = get_itu_mos(dic_for_mos)
+                        pprint.pprint(mos)
+                        results['ITU_mos'] = mos
+                    except Exception as e:
+                        print("Got one error : "+str(e))
+                        mos = 0
+                        results['ITU_mos'] = mos
             except KeyboardInterrupt:
                 print("Server interrupted")
                 not_interrupted = False
@@ -157,7 +171,10 @@ def get_res_for_MOS(results):
     else:
         test['stalling'] = []
     test['resolutions'] =\
-            json.loads("["+str(results["true_resolutions"][0])+"]")
+            [i for i in\
+            json.loads("["+str(results["true_resolutions"][0])+"]")\
+            if '0x0' not in i['true_res']]
+
     test['join_time'] = float(results['join_time'][0])
     test['end_time'] = float(results['end_time'][0])
     return test
