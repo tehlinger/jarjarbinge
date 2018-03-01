@@ -98,15 +98,22 @@ def main():
                 print("===RES===")
                 pprint.pprint(results)
                 print("===MOS===")
-                dic_for_mos = get_res_for_MOS(results)
-                if dic_for_mos['resolutions'] is None or\
-                        len(dic_for_mos['resolutions']) == 0:
+                if 'true_resolutions' not in results.keys():
                         print('Not launched')
                 else:
+                    dic_for_mos = get_res_for_MOS(results)
+
+                    mos = get_itu_mos(dic_for_mos)
+                    pprint.pprint(mos)
+                    results['ITU_mos'] = mos
                     try:
-                        mos = get_itu_mos(dic_for_mos)
-                        pprint.pprint(mos)
-                        results['ITU_mos'] = mos
+                        dic_for_mos = get_res_for_MOS(results)
+                        if len(dic_for_mos['resolutions']) == 0:
+                            print('Not launched.')
+                        else:
+                            mos = get_itu_mos(dic_for_mos)
+                            pprint.pprint(mos)
+                            results['ITU_mos'] = mos
                     except Exception as e:
                         print("Got one error : "+str(e))
                         mos = 0
