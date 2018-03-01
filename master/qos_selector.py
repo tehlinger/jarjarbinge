@@ -1,4 +1,5 @@
 import random
+import numpy as np
 import itertools
 
 class QosSelector:
@@ -14,10 +15,10 @@ class QosSelector:
                 'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
                 'dl_jit_ms': None, 'ul_los': None}
         self.sup_inf = \
-                {'dl_los': [0,30], 'dl_del_ms': [1,3500],
+                {'dl_los': [0,40], 'dl_del_ms': [1,1500],
                         'ul_rat_kb': [0,8000], 'ul_jit_ms': [0,300],
                     'ul_del_ms': [1,750], 'dl_rat_kb': [0,8000],
-                        'dl_jit_ms': [0,300], 'ul_los': [0,30]}
+                        'dl_jit_ms': [0,300], 'ul_los': [0,40]}
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
 
@@ -31,13 +32,16 @@ class QosSelector:
                     [i for i in range(inf,sup,int((sup-inf)/n))]
         return result
 
-    def random_point(self):
+    def random_point(self,N=8):
         result = {}
         for k, sup_inf in self.sup_inf.items():
             inf = sup_inf[0]
             sup = sup_inf[1]
-            value = random.randint(inf,sup)
-            result[k] = value
+            #value = random.randint(inf,sup)
+            value = random.choice([i/10e2 for i in np.logspace(0,3,num=8)]) * (sup-inf)
+            if 'kb' in k:
+                value = sup-value
+            result[k] = round(value)
         return result
 
     def create_iterator(self):
