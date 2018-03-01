@@ -25,3 +25,27 @@ format code  extension  resolution note
 18           mp4        640x360    medium , avc1.42001E, mp4a.40.2@ 96k
 43           webm       640x360    medium , vp8.0, vorbis@128k
 22           mp4        1280x720   hd720 , avc1.64001F, mp4a.40.2@192k (best)
+
+code  extension  resolution note
+249           52k , opus @ 50k, 355.54KiB
+250           68k , opus @ 70k, 465.81KiB
+171          120k , vorbis@128k, 825.38KiB
+140          128k , m4a_dash container, mp4a.40.2@128k, 934.58KiB
+251          134k , opus @160k, 922.04KiB
+160          256x144   111k , avc1.4d400c, 24fps, video only, 627.36KiB
+278          256x144   128k , webm container, vp9, 24fps, video only, 819.86KiB
+133          426x240   247k , avc1.4d4015, 24fps, video only, 1.25MiB
+242          426x240   292k , vp9, 24fps, video only, 1.67MiB
+243          640x360   539k , vp9, 24fps, video only, 3.02MiB
+134          640x360   635k , avc1.4d401e, 24fps, video only, 3.06MiB
+244          854x480   950k , vp9, 24fps, video only, 5.17MiB
+135          854x480   1163k , avc1.4d401e, 24fps, video only, 5.77MiB
+247          1280x720  1987k , vp9, 24fps, video only, 9.99MiB
+136          1280x720  2320k , avc1.4d401f, 24fps, video only, 10.57MiB
+248          1920x1080 3586k , vp9, 24fps, video only, 17.99MiB
+137          1920x1080 4327k , avc1.640028, 24fps, video only, 18.09MiB
+17           176x144   , mp4v.20.3, mp4a.40.2@ 24k
+36           320x180   , mp4v.20.3, mp4a.40.2
+18           640x360   , avc1.42001E, mp4a.40.2@ 96k
+43           640x360   , vp8.0, vorbis@128k
+22           1280x720  , avc1.64001F, mp4a.40.2@192k (best)
