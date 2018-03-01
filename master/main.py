@@ -74,7 +74,7 @@ def main():
     qos_selector = QosSelector(10)
     while not_interrupted:
         try:
-            qos = qos_selector.random_point_in_finite_space()
+            qos = qos_selector.random_point()
             #Following are line to get a static qos conf
             #qos = QosSelector.get_clear_qos()
             #qos['dl_rat_kb'] = 8000

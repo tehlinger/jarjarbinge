@@ -41,7 +41,7 @@ class QosSelector:
             value = random.choice([i/10e2 for i in np.logspace(0,3,num=8)]) * (sup-inf)
             if 'kb' in k:
                 value = sup-value
-            result[k] = round(value)
+            result[k] = int(round(value))
         return result
 
     def create_iterator(self):
