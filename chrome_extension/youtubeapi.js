@@ -19,11 +19,11 @@ var clen_video=0;
 var dur=0;
 
 function json_stall_str(player,lastStallDuration){
-    	return "{ts : "+player.getCurrentTime()+",duration:"+lastStallDur.toString()+"}";
+    	return '{"ts" : '+player.getCurrentTime()+',"duration":'+lastStallDur.toString()+"}";
 	}
 
 function json_bswitches_str(player){
-	return "{ts :"+player.getCurrentTime()+",quality:"+player.setPlaybackQuality()+"}";
+	return '{"ts" :'+player.getCurrentTime()+",'quality':"+player.setPlaybackQuality()+"}";
 	}
 
 chrome.runtime.onMessage.addListener(
@@ -342,7 +342,7 @@ function checkBuffer(){
     if (player_load_time==0) {
         var timeFromStart=parseFloat(ts)-parseFloat(ts_start_js);
         if (timeFromStart>LOAD_LIMIT){
-            //sendVideoInfo("playerLoadTimeHigh");
+            sendVideoInfo("playerLoadTimeHigh");
         }
         else{
             setTimeout(checkBuffer, 1000);
@@ -424,13 +424,13 @@ function sendVideoInfo(status){
         var params="ts_start_js=-1";
     }
     else if (status=="videoEnded" || status=="videoDownloaded"){
-        var params="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+player_load_time+"&join_time="+join_time+"&httpInfo="+httpInfo+"&availableQualityLevels="+availableQualityLevels+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"&timeout=no"+"&getVideoLoadedFraction="+player.getVideoLoadedFraction()+"&resolution="+player.getPlaybackQuality()+"&bufferSizeWhenStart="+bufferSizeWhenStart+"&clen_video="+clen_video+"&clen_audio="+clen_audio+"&dur="+dur+"&QoE="+QoE+"&bitrate_switch="+bitrateSwitches+"&true_resolutions="+true_resolutions;
+        var params="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+player_load_time+"&join_time="+join_time+"&httpInfo="+httpInfo+"&availableQualityLevels="+availableQualityLevels+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"&timeout=no"+"&getVideoLoadedFraction="+player.getVideoLoadedFraction()+"&resolution="+player.getPlaybackQuality()+"&bufferSizeWhenStart="+bufferSizeWhenStart+"&clen_video="+clen_video+"&clen_audio="+clen_audio+"&dur="+dur+"&QoE="+QoE+"&bitrate_switch="+bitrateSwitches+"&true_resolutions="+true_resolutions+"&end_time="+player.getCurrentTime();
     }
     else if (status=="playerLoadTimeHigh"){
-        var params="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+"310000"+"&join_time="+join_time+"&httpInfo="+httpInfo+"&availableQualityLevels="+availableQualityLevels+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"&timeout=no"+"&getVideoLoadedFraction="+"0"+"&resolution="+resolution+"&bufferSizeWhenStart="+bufferSizeWhenStart+"&clen_video="+clen_video+"&clen_audio="+clen_audio+"&dur="+dur+"&QoE=0"+"&bitrate_switch="+bitrateSwitches+"&true_resolutions="+true_resolutions;
+        var params="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+"310000"+"&join_time="+join_time+"&httpInfo="+httpInfo+"&availableQualityLevels="+availableQualityLevels+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"&timeout=no"+"&getVideoLoadedFraction="+"0"+"&resolution="+resolution+"&bufferSizeWhenStart="+bufferSizeWhenStart+"&clen_video="+clen_video+"&clen_audio="+clen_audio+"&dur="+dur+"&QoE=0"+"&bitrate_switch="+bitrateSwitches+"&true_resolutions="+true_resolutions+"&end_time="+player.getCurrentTime();
     }
     else if (status=="joinTimeHigh"){
-        var params="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+player_load_time+"&join_time="+"310000"+"&httpInfo="+httpInfo+"&availableQualityLevels="+availableQualityLevels+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"&timeout=no"+"&getVideoLoadedFraction="+"0"+"&resolution="+resolution+"&bufferSizeWhenStart="+bufferSizeWhenStart+"&clen_video="+clen_video+"&clen_audio="+clen_audio+"&dur="+dur+"&QoE=0"+"&bitrate_switch="+bitrateSwitches+"&true_resolutions="+true_resolutions;
+        var params="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+player_load_time+"&join_time="+"310000"+"&httpInfo="+httpInfo+"&availableQualityLevels="+availableQualityLevels+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"&timeout=no"+"&getVideoLoadedFraction="+"0"+"&resolution="+resolution+"&bufferSizeWhenStart="+bufferSizeWhenStart+"&clen_video="+clen_video+"&clen_audio="+clen_audio+"&dur="+dur+"&QoE=0"+"&bitrate_switch="+bitrateSwitches+"&true_resolutions="+true_resolutions+"&end_time="+player.getCurrentTime();
     }
 
     xhttp.open("POST","http://localhost:8000",true)

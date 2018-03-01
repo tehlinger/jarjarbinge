@@ -28,7 +28,9 @@ function resolution_data(res_text,panel_html){
 		first_dig_index = res_text.indexOf(res_text.match(/\d/))
 		res_text = res_text.slice(first_dig_index)
 		res_values = res_text.replace(/\s+/g, '').split('/');
-		vid_aud_codec = panel_html.children[4].textContent.match(/\d+/g).map(Number);
+		codecs_text = panel_html.children[4].textContent;
+		codecs_text= codecs_text.slice(codecs_text.indexOf("("));
+		vid_aud_codec = codecs_text.match(/\d+/g).map(Number);
 		return {"optimal_res":res_values[1],
 			"true_res":res_values[0],
 			"codecs":vid_aud_codec}
