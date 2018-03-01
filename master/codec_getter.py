@@ -1,8 +1,5 @@
 import pandas as pd
 
-def prepare_json_for_mos(res_dic,video_ID="oFkulzWMotY"):
-    return {}
-
 class codecGetter:
     def __init__(self,video_ID):
         self.df = pd.read_csv("../dash_manifests/"+video_ID+".csv")
@@ -14,11 +11,11 @@ class codecGetter:
         if 'audio' not in entry['resolution']:
             name = "h264" if "avc" in entry['codec'] else "vp9"
             res  = entry['resolution']
-            bitrate = entry['bitrate']
+            bitrate = int(entry['bitrate'][:-1])
             fps = int(entry['fps'][:-3])
             return {'codec':name, 'res':res,
                     'bitrate':bitrate,'fps':fps}
         #If the codec is an audio codec
         else:
             name = "heaac" if "opus" in entry['codec'] else "aaclc"
-            return {"codec":name,"bitrate":entry['bitrate']}
+            return {"codec":name,"bitrate":int(entry['bitrate'][:-1])}

@@ -1,4 +1,10 @@
 from codec_getter import codecGetter
+import itu_p1203
+import pickle
+
+def get_itu_mos(resolutions):
+    input_dic = prepare_json_for_mos(resolutions)
+    return itu_p1203.P1203Standalone(input_dic).calculate_complete()['O46']
 
 def prepare_json_for_mos(play_dic,video_id="oFkulzWMotY"):
     stall_dic = get_stall_dic(play_dic)
@@ -7,9 +13,18 @@ def prepare_json_for_mos(play_dic,video_id="oFkulzWMotY"):
     aud_dic = merge_same_codec(get_aud_dic(play_dic,cg))
     return {
             "IGen" : static_gen_entry(),
-            "I11"  : aud_dic,
-            "I13"  : vid_dic,
-            "I23"  : stall_dic
+            "I11"  : {
+                "streamId" : 42,
+                "segments" : aud_dic
+                },
+            "I13"  : {
+                "streamId" : 42,
+                "segments" : vid_dic,
+                },
+            "I23"  : {
+                "streamId" : 42,
+                "stalling" : stall_dic
+                }
             }
 
 
@@ -29,9 +44,9 @@ def get_stall_dic(play_dic):
 
 def get_join_time(play_dic):
     """Extracts and format the 'join_time' entry of the dic"""
-    if ('join_time' in d.keys()) and d['join_time'] is not None\
-            and d['join_time'] > 0:
-                return [[0,float(d['join_time'])/1000.0]]
+    if ('join_time' in play_dic.keys()) and play_dic['join_time'] is not None\
+            and play_dic['join_time'] > 0:
+                return [[0,float(play_dic['join_time'])/1000.0]]
     else:
         return []
 
@@ -49,9 +64,9 @@ def formatted_seg_list(seg_list,end_time,codecs_getter,get_codec_function):
     start = round(head['ts'],4)
     end = round(get_next_ts(seg_list,end_time),4)
     seg = get_codec_function(head,codecs_getter)
-    seg['dur'] = round(end - start,4)
+    seg['duration'] = round(end - start,4)
     seg['start'] = start
-    seg['res'] = head['true_res'].split('@')[0]
+    seg['resolution'] = head['true_res'].split('@')[0]
     if len(seg_list) == 1:
         return [seg]
     else:
@@ -70,21 +85,19 @@ def merge_same_codec(seg_list,is_video=False,last_segment=None):
             if same_seg_type(last_segment,head,is_video):
                 cumulated_seg = head.copy()
                 cumulated_seg['start'] = last_segment['start']
-                cumulated_seg['dur']   = head['dur']+last_segment['dur']
+                cumulated_seg['duration']= head['duration']+last_segment['duration']
                 return [cumulated_seg]
             else:
                 return [last_segment]+[head]
     if last_segment is None or same_seg_type(last_segment,head,is_video):
-        if is_video:
-            print("i'm in")
         if last_segment is None:
             cumulated_seg = head.copy()
             cumulated_seg['start'] = head['start']
-            cumulated_seg['dur']   = head['dur']
+            cumulated_seg['duration']   = head['duration']
         else:
             cumulated_seg = head.copy()
             cumulated_seg['start'] = last_segment['start']
-            cumulated_seg['dur']   = head['dur']+last_segment['dur']
+            cumulated_seg['duration'] = head['duration']+last_segment['duration']
         return merge_same_codec(seg_list[1:],is_video,cumulated_seg)
     else:
         return [last_segment]+merge_same_codec(seg_list[1:],is_video,head)
@@ -93,7 +106,7 @@ def same_seg_type(seg1,seg2,is_video):
     if is_video:
         return seg1['codec'] == seg2['codec'] and\
                 seg1['bitrate'] == seg2['bitrate'] and\
-                seg1['res'] == seg2['res']
+                seg1['resolution'] == seg2['resolution']
     else:
         return seg1['codec'] == seg2['codec'] and\
                 seg1['bitrate'] == seg2['bitrate']
