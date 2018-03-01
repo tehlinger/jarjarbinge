@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+
+  "name": "MyOwnYouTube",
+  "description": "Tracks all HTTP requests made from the current tab.",
+  "version": "0.71",
+
+  "permissions": [
+    "activeTab",
+    "webRequest",
+    "<all_urls>"
+  ],
+  "content_scripts": [{
+    "matches": [
+	    "https://www.youtube.com/embed/*chrome-extension*"
+    ],
+    "js": [ "js/stats.js" ],
+    "all_frames": true
+  }],
+  "background": {
+    "scripts": ["js/background.js"],
+    "all_frames": true
+  },
+
+  "browser_action": {
+    "default_icon": "icons/http_trace_button.png",
+    "default_title": "MyOwnYouTube"
+  },
+  "content_security_policy": "script-src 'self' https://*.youtube.com https://*.ytimg.com; object-src 'self'"
+}
