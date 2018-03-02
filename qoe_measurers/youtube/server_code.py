@@ -55,6 +55,7 @@ def MakeHandlerClassFromArgv(init_args):
                     s.send_header("resolution","hd1080")
                     s.send_header("videoDuration","30")
                     s.end_headers()
+                    time.sleep(0.5)
                     x = 150
                     #x = 2150
                     y = 150
