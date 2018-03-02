@@ -25,7 +25,7 @@ qoe_metrics = \
 'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
 'player_load_time', 'resolution', 'stallingNumber', 'timeout',
 'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
-'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js','bitrate_switch']
+'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js']
 
 def header_line():
     r = ""
@@ -101,11 +101,6 @@ def main():
                 if 'true_resolutions' not in results.keys():
                         print('Not launched')
                 else:
-                    dic_for_mos = get_res_for_MOS(results)
-
-                    mos = get_itu_mos(dic_for_mos)
-                    pprint.pprint(mos)
-                    results['ITU_mos'] = mos
                     try:
                         dic_for_mos = get_res_for_MOS(results)
                         if len(dic_for_mos['resolutions']) == 0:
