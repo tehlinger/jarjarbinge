@@ -25,7 +25,7 @@ qoe_metrics = \
 'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
 'player_load_time', 'resolution', 'stallingNumber', 'timeout',
 'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
-'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js']
+'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js','video_id']
 
 def header_line():
     r = ""
@@ -127,25 +127,6 @@ def main():
         #except Exception as e:
         #    print("Got one error : "+str(e))
 
-def play_scenar_1(qos):
-    """
-    Functions for debugging. Will change the dl_rate
-    during specific interval to get youtube stalling
-    """
-    time.sleep(2)
-    qos['dl_rat_kb'] = 2800
-    r = requests.post("http://127.0.0.1:8002/",data=qos)
-    time.sleep(2)
-    qos['dl_rat_kb'] = 100
-    r = requests.post("http://127.0.0.1:8002/",data=qos)
-    time.sleep(6)
-    qos['dl_rat_kb'] = 3500
-    time.sleep(4)
-    r = requests.post("http://127.0.0.1:8002/",data=qos)
-    qos['dl_rat_kb'] = 100
-    r = requests.post("http://127.0.0.1:8002/",data=qos)
-    time.sleep(2)
-
 #Code to change the rate after a few seconds
 #time.sleep(1)
 #144p
@@ -177,6 +158,7 @@ def get_res_for_MOS(results):
             json.loads("["+str(results["true_resolutions"][0])+"]")\
             if '0x0' not in i['true_res']]
 
+    test['video_id'] = results['video_id'][0]
     test['join_time'] = float(results['join_time'][0])
     test['end_time'] = float(results['end_time'][0])
     return test

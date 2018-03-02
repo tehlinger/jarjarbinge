@@ -42,11 +42,14 @@ class Summary:
     #        ['red','red','red','red','red',
     #        'green','green','green','green','green']
 
+    color_list = \
+            ['green','lightgreen','yellow','orange','red','black']
+
     #NON-MANICHEAN GRID
-    color_list =\
-            ['black','black','red','red',
-            'orange','orange','yellow',
-            'yellow','green','green']
+    #color_list =\
+    #        ['black','black','red','red',
+    #        'orange','orange','yellow',
+    #        'yellow','green','green']
     #color_list = ['black', 'grey', 'sienna', 'firebrick', 'red', 'orange',
     #'greenyellow','yellow', 'lightgreen', 'forestgreen','green']
 
@@ -123,9 +126,11 @@ def custom_legend(ax):
             Line2D([0], [0], color=mcolors.CSS4_COLORS['red'], lw=4),\
             Line2D([0], [0], color=mcolors.CSS4_COLORS['orange'], lw=4),\
             Line2D([0], [0], color=mcolors.CSS4_COLORS['yellow'], lw=4),\
+            Line2D([0], [0], color=mcolors.CSS4_COLORS['lightgreen'], lw=4),\
             Line2D([0], [0], color=mcolors.CSS4_COLORS['green'], lw=4)]
     ax.legend(custom_lines, \
-            ['<20 %', '<40 %', '<60 %','<80 %','<100 %'],
+            reversed(['0%<x<=1%', '1%<x<=5%',\
+                '5%<x<=10%','10%<x<=20%','20%<x<=40%','40%<x<=100%']),
             loc='center')
 
 
