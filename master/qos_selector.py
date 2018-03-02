@@ -38,9 +38,10 @@ class QosSelector:
             inf = sup_inf[0]
             sup = sup_inf[1]
             #value = random.randint(inf,sup)
-            value = random.choice([i/10e2 for i in np.logspace(0,3,num=8)]) * (sup-inf)
-            if 'kb' in k:
-                value = sup-value
+            if 'kb' not in k:
+                value = random.choice([i/10e2 for i in np.logspace(0,3,num=8)]) * (sup-inf)
+            else:
+                value = random.choice([125*pow(2,i) for i in range(0,8)])
             result[k] = int(round(value))
         return result
 
