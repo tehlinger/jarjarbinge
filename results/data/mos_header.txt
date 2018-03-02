@@ -1,0 +1,1 @@
+dl_los,dl_del_ms,ul_rat_kb,ul_jit_ms,ul_del_ms,dl_rat_kb,dl_jit_ms,ul_los,MOS,QoE,availableQualityLevels,bufferSizeWhenStart,clen_audio,clen_video,dur,getVideoLoadedFraction,httpInfo,join_time,player_load_time,resolution,stallingNumber,timeout,totalStallDuration,ts_firstBuffering,ts_onPlayerReadyEvent,ts_onYTIframeAPIReady,ts_startPlaying,ts_start_js,bitrate_switches

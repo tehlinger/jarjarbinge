@@ -16,7 +16,7 @@ from mos_p_1203 import get_itu_mos
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/test_beta.csv"
+RESULTS = "results/grid_mos_1.csv"
 qos_metrics = \
                 ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms', 'ul_del_ms',
                         'dl_rat_kb', 'dl_jit_ms', 'ul_los']
