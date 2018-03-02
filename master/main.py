@@ -16,7 +16,7 @@ from mos_p_1203 import get_itu_mos
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/test_beta.csv"
+RESULTS = "results/test_mos.csv"
 qos_metrics = \
                 ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms', 'ul_del_ms',
                         'dl_rat_kb', 'dl_jit_ms', 'ul_los']
@@ -101,11 +101,6 @@ def main():
                 if 'true_resolutions' not in results.keys():
                         print('Not launched')
                 else:
-                    dic_for_mos = get_res_for_MOS(results)
-
-                    mos = get_itu_mos(dic_for_mos)
-                    pprint.pprint(mos)
-                    results['ITU_mos'] = mos
                     try:
                         dic_for_mos = get_res_for_MOS(results)
                         if len(dic_for_mos['resolutions']) == 0:
