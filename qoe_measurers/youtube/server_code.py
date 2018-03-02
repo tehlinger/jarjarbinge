@@ -8,6 +8,8 @@ from pprint import pprint
 from launch_experiment import *
 import pprint
 
+#ids = ["AntcyqJ6brc","oFkulzWMotY","x02xX2dv6bQ"]
+
 def page_write(s,message):
     s.wfile.write(message.encode('utf-8'))
 
@@ -40,9 +42,16 @@ def MakeHandlerClassFromArgv(init_args):
                 if path =="/getVideoID_Res":
                 #chrome extension (client) wants data
                 #on the video he must play
+                    vid_id = random.choice(["bUhdSs0VK9c",
+                        "im_2tkN4VKY",
+                        "O3zza3ofZ0Q",
+                        "oFkulzWMotY",
+                        "RSzD92Rl8j4",
+                        "tSjhLFWj9TU"
+                        ])
                     s.send_response(200)
                     s.send_header("Access-Control-Allow-Origin","*")
-                    s.send_header("videoID","oFkulzWMotY")
+                    s.send_header("videoID",vid_id)
                     s.send_header("resolution","hd1080")
                     s.send_header("videoDuration","30")
                     s.end_headers()

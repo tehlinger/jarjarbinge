@@ -2,8 +2,8 @@ from codec_getter import codecGetter
 import itu_p1203
 import pickle
 
-def get_itu_mos(resolutions):
-    input_dic = prepare_json_for_mos(resolutions)
+def get_itu_mos(results):
+    input_dic = prepare_json_for_mos(results,results["video_id"])
     return itu_p1203.P1203Standalone(input_dic).calculate_complete()['O46']
 
 def prepare_json_for_mos(play_dic,video_id="oFkulzWMotY"):
