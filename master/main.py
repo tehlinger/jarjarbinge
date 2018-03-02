@@ -25,7 +25,7 @@ qoe_metrics = \
 'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
 'player_load_time', 'resolution', 'stallingNumber', 'timeout',
 'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
-'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js','bitrate_switch']
+'ts_onYTIframeAPIReady', 'ts_startPlaying', 'ts_start_js']
 
 def header_line():
     r = ""
