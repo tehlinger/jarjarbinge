@@ -16,12 +16,12 @@ from mos_p_1203 import get_itu_mos
 
 HOST_NAME="127.0.0.1"
 PORT_NUMBER = 8000
-RESULTS = "results/grid_mos_1_A.csv"
+RESULTS = "results/codec_test.csv"
 qos_metrics = \
                 ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms', 'ul_del_ms',
                         'dl_rat_kb', 'dl_jit_ms', 'ul_los']
 qoe_metrics = \
-['ITU_mos','QoE', 'availableQualityLevels', 'bufferSizeWhenStart', 'clen_audio',
+['MOS_mp2','MOS_ac3','MOS_aaclc','MOS_heaac','QoE', 'availableQualityLevels', 'bufferSizeWhenStart', 'clen_audio',
 'clen_video', 'dur', 'getVideoLoadedFraction', 'httpInfo', 'join_time',
 'player_load_time', 'resolution', 'stallingNumber', 'timeout',
 'totalStallDuration', 'ts_firstBuffering', 'ts_onPlayerReadyEvent',
@@ -106,9 +106,11 @@ def main():
                         if len(dic_for_mos['resolutions']) == 0:
                             print('Not launched.')
                         else:
-                            mos = get_itu_mos(dic_for_mos)
+                            mos = get_itu_mos(dic_for_mos,all_audio=True)
                             pprint.pprint(mos)
-                            results['ITU_mos'] = mos
+                            for codec, score in mos:
+                                cod_key = 'MOS_'+codec
+                                results[cod_key] = score
                     except Exception as e:
                         print("Got one error : "+str(e))
                         mos = 0

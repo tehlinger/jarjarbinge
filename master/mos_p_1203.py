@@ -2,11 +2,29 @@ from codec_getter import codecGetter
 import itu_p1203
 import pickle
 
-def get_itu_mos(results):
+def get_itu_mos(results,all_audio=False):
+    """
+    Get the O.46 itu-t MOS (std P.1203
+    If all_audio is true, returns the score for every possible
+    audio codec.
+    """
     input_dic = prepare_json_for_mos(results,results["video_id"])
-    return itu_p1203.P1203Standalone(input_dic).calculate_complete()['O46']
+    if not all_audio:
+        return itu_p1203.P1203Standalone(input_dic).calculate_complete()['O46']
+    else:
+        result = []
+        for audio_codec in ["mp2", "ac3", "aaclc", "heaac"]:
+            set_aud_codec(input_dic,audio_codec)
+            result.append((audio_codec,itu_p1203.P1203Standalone(input_dic).calculate_complete()['O46']))
+        return result
 
-def prepare_json_for_mos(play_dic,video_id="oFkulzWMotY"):
+
+def set_aud_codec(input_dic,audio_codec):
+   for aud_seg in input_dic["I11"]["segments"]:
+       aud_seg["codec"] = audio_codec
+
+
+def prepare_json_for_mos(play_dic,video_id,audio_codec=None):
     stall_dic = get_stall_dic(play_dic)
     cg = codecGetter(video_id)
     vid_dic = merge_same_codec(get_vid_dic(play_dic,cg),is_video=True)
