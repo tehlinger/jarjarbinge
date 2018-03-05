@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler,HTTPServer
 import time
 from urllib import parse
 import pprint
+import os
 
 from traffic_controller import TrafficController
 
@@ -35,6 +36,7 @@ def MakeHandlerClassFromArgv(init_args):
             #pprint.pprint(received_net_cond)
             TrafficController.net_conditions = received_net_cond
             #The network conditions of the machine are chenged HERE
+            #os.system("killall chrome")
             QoSHandler.tc.set_conditions()
             self.send_response(200)
             self.send_header("Content-type","application/json")
