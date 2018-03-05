@@ -1,9 +1,7 @@
 import pandas as pd
 
-RESULT_FILES = ["../data/B_grid_random_beta_B.csv",
-                "../data/grid_random_beta.csv"]
-
-
+RESULT_FILES = ["../data/grid_mos_1_A.csv",
+                "../data/grid_mos_1_B.csv"]
 
 def load_col_names(f):
     with open(f,'r') as f :
@@ -24,6 +22,13 @@ def load_csv(files : 'str_list'=RESULT_FILES,header_file : 'file_path' = '../dat
         else:
             result = df
     return result
+
+def load_MOS(files : 'str_list'=RESULT_FILES,header_file : 'file_path' =
+        '../data/header.txt'):
+    df = load_results(files,header_file)
+    df.loc[df.join_time == 310000,"MOS"] = 1
+    df.loc[df.player_load_time == 310000,"MOS"] = 1
+    return df
 
 def fill_nans(df):
     col_with_nans = get_labels_with_NaNs(df)

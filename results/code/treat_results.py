@@ -44,6 +44,8 @@ class Summary:
 
     color_list = \
             ['green','lightgreen','yellow','orange','red','black']
+    mos_color_list = \
+            ['black', 'red', 'orange', 'yellow', 'green']
 
     #NON-MANICHEAN GRID
     #color_list =\
@@ -75,7 +77,7 @@ class Summary:
     def __str__(self):
         return "Played : " +str(self.nb_played)+"/"+str(len(self))
 
-    def nice_grid(self,min_meas=0,ignore_dead=False):
+    def nice_grid(self,min_meas=0,ignore_dead=False,target="MOS"):
         """
         Displays the grid of all the scatter plots (SP) for each pair of metric.
         ignore_dead : the SP will not take in account the measure of videos
@@ -83,10 +85,12 @@ class Summary:
         min_meas : the minimum of measure per point required to be displayed.
         """
         cols = Summary.qos_metrics
-        cols = list(set(Summary.qos_metrics+["resolution"])\
-                -set(['ul_rat_kb','ul_jit_ms','dl_jit_ms','resolution']))
+        cols = list(set(Summary.qos_metrics+[target])\
+                -set(['ul_rat_kb','ul_jit_ms','dl_jit_ms',target]))
+                #-set([target]))
         width = len(cols)
         fig, axes = plt.subplots(width-1,width-1)
+        plt.suptitle("Mean MOS per subspace",fontsize=20)
         for m1 in cols:
             for m2 in cols:
                 if m1 != m2:
@@ -94,15 +98,46 @@ class Summary:
                     y = cols.index(m2)
                     if x > y:
                         ax = axes[y][x-1]
-                        self.prop_scat(m1,m2,ax,min_meas,ignore_dead)
+                        if target == "MOS":
+                            self.mos_scat(m1,m2,ax,min_meas)
+                            ax.set_xscale("log")
+                            ax.set_yscale("log")
+                            if 'los' in m2:
+                                ax.set_ylim(bottom=0.65)
+                            if 'los' in m1:
+                                ax.set_xlim(left=0.85)
+                            else:
+                                ax.set_xlim(left=0)
+                        else:
+                            self.prop_scat(m1,m2,ax,min_meas,ignore_dead)
+                    #else:
+                    #    if x < y:
+                    #        fig.delaxes(axes[y-1][x-1])
+                            #"linear", "log", "symlog", "logit"
                         #ax.set(xlabel=x,ylabel=y)
         #plt.subplots_adjust(left=None, bottom=None, right=None, top=None,
         #                        wspace=None, hspace=None)
         blank_space = 0.20
         plt.subplots_adjust(hspace=0.57,wspace=blank_space)
-        custom_legend(axes[3][2])
+        if target != "MOS":
+            custom_legend(axes[3][2])
+        else:
+            custom_mos_legend()
         #plt.tight_layout()
         plt.show()
+
+    def mos_scat(self,x_metric,y_metric,ax,min_meas):
+        """
+        Adds one scatter plot to the grid for the MOS.
+        """
+        df = get_df_of_points_grouped_by_conditions(self.df,x_metric,y_metric,min_meas)
+        for color in df[0].unique():
+            if color != 0:
+                #c = Summary.color_dic[res]
+                x = list(df[df[0] == color][x_metric])
+                y = list(df[df[0] == color][y_metric])
+                ax.scatter(x,y,color=color,s=100)
+                ax.set(xlabel=x_metric,ylabel=y_metric)
 
     def prop_scat(self,x_metric,y_metric,ax,min_meas,ignore_dead):
         """
@@ -133,6 +168,15 @@ def custom_legend(ax):
                 '5%<x<=10%','10%<x<=20%','20%<x<=40%','40%<x<=100%']),
             loc='center')
 
+def custom_mos_legend():
+    plt.subplot(4,4,13)
+    c_map =  plt.get_cmap('RdYlGn')
+    sm = plt.cm.ScalarMappable(cmap=c_map, norm=plt.Normalize(vmin=1,vmax=4.5))
+    sm._A = []
+    n = matplotlib.colors.Normalize(vmin=1,vmax=4.5)
+    cax = plt.axes([0.10, 0.03, 0.8, 0.025])
+    cbar = plt.colorbar(sm,cax=cax,norm=n,orientation='horizontal')
+    cbar.ax.tick_params(labelsize=16)
 
 def condition(x):
     """
@@ -150,6 +194,26 @@ def count_condition_per_group(x):
     """
     return condition(x).\
             shape[0]/x.shape[0]
+
+def get_df_of_points_grouped_by_conditions(df,col1,col2,min_meas,\
+        func=count_condition_per_group):
+    """
+    Groups all the point of a scatterplot and applies the function func to it.
+    func takes as argument the Dataframe of all the points that have the same
+    metric col1 and col2, and returns a value between 0 and 1.
+    """
+    groups = df.groupby([col1,col2])
+    c_map =  plt.get_cmap('RdYlGn')
+    #result = groups.MOS.mean().apply(lambda x : \
+    #        Summary.mos_color_list[0] if x == 1
+    #        else  Summary.mos_color_list[int(round(x))])
+    result = groups.MOS.mean().apply(lambda x : \
+            c_map((x-1)/3.5))
+    tmp = groups[['QoE']].count()
+    final_res = groups[['QoE']].count()
+    final_res[0] = result
+    final_res['nb_meas'] = final_res['QoE']
+    return final_res[final_res['nb_meas'] > min_meas].reset_index()
 
 def display_points_matching_condition(df,col1,col2,min_meas,\
         func=count_condition_per_group):
