@@ -1,4 +1,5 @@
 import pprint
+import matplotlib.colors
 from matplotlib.lines import Line2D
 import math
 from matplotlib import colors as mcolors
@@ -98,6 +99,8 @@ class Summary:
                     y = cols.index(m2)
                     if x > y:
                         ax = axes[y][x-1]
+                        #ax.set_facecolor('#b8c5db')
+                        sns.set()
                         if target == "MOS":
                             self.mos_scat(m1,m2,ax,min_meas)
                             ax.set_xscale("log")
@@ -136,7 +139,7 @@ class Summary:
                 #c = Summary.color_dic[res]
                 x = list(df[df[0] == color][x_metric])
                 y = list(df[df[0] == color][y_metric])
-                ax.scatter(x,y,color=color,s=100)
+                ax.scatter(x,y,color=color,s=80,edgecolor='k')
                 ax.set(xlabel=x_metric,ylabel=y_metric)
 
     def prop_scat(self,x_metric,y_metric,ax,min_meas,ignore_dead):
