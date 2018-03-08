@@ -10,7 +10,6 @@ from qos_selector import *
 def page_write(self,message):
     self.wfile.write(message.encode('utf-8'))
 
-
 def MakeHandlerClassFromArgv(init_args):
     """
     Returns the class (class factory)
@@ -33,9 +32,6 @@ def MakeHandlerClassFromArgv(init_args):
         def do_POST(self):
             """Response do a POST"""
             results = self.get_params()
-            #pprint.pprint(results_short(results))
-            print("QOE :" +str(results['QoE']))
-            print("======")
             self.send_response(200)
             self.send_header("Content-type","application/json")
             self.end_headers()
