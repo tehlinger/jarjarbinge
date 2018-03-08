@@ -19,7 +19,7 @@ from db_saver import *
 HOST_NAME="127.0.0.1"
 DB_IP = '138.96.65.33'
 PORT_NUMBER = 8000
-EXP_NAME = 'mongo_test_2'
+EXP_NAME = 'linear_rand_1'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
 
 def main(fault_tolerant=False):
