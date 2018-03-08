@@ -3,6 +3,8 @@ import pandas as pd
 RESULT_FILES = ["../data/grid_mos_1_A.csv",
                 "../data/grid_mos_1_B.csv"]
 
+MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
+
 def load_col_names(f):
     with open(f,'r') as f :
         return f.readline()[:-1].split(',')
@@ -24,10 +26,18 @@ def load_csv(files : 'str_list'=RESULT_FILES,header_file : 'file_path' = '../dat
     return result
 
 def load_MOS(files : 'str_list'=RESULT_FILES,header_file : 'file_path' =
-        '../data/header.txt'):
+        '../data/header_mos.txt'):
     df = load_results(files,header_file)
     df.loc[df.join_time == 310000,"MOS"] = 1
     df.loc[df.player_load_time == 310000,"MOS"] = 1
+    return df
+
+def load_triple_MOS(files : 'str_list'=RESULT_FILES,header_file : 'file_path' =
+        '../data/header.txt'):
+    df = load_results(files,header_file)
+    for mos in ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]:
+        df.loc[df.join_time == 310000,mos] = 1
+        df.loc[df.player_load_time == 310000,mos] = 1
     return df
 
 def fill_nans(df):
