@@ -17,7 +17,7 @@ class QosSelector:
         self.sup_inf = \
                 {'dl_los': [0,40], 'dl_del_ms': [1,1500],
                         'ul_rat_kb': [0,8000], 'ul_jit_ms': [0,300],
-                    'ul_del_ms': [1,750], 'dl_rat_kb': [0,8000],
+                    'ul_del_ms': [1,1500], 'dl_rat_kb': [0,8000],
                         'dl_jit_ms': [0,300], 'ul_los': [0,40]}
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
@@ -39,9 +39,11 @@ class QosSelector:
             sup = sup_inf[1]
             #value = random.randint(inf,sup)
             if 'kb' not in k:
-                value = random.choice([i/10e2 for i in np.logspace(0,3,num=8)]) * (sup-inf)
+                #value = random.choice([i/10e2 for i in np.logspace(0,3,num=N)]) * (sup-inf)
+                value = random.random() * (sup - inf)
             else:
-                value = random.choice([125*pow(2,i) for i in range(0,8)])
+                #value = random.choice([125*pow(2,i) for i in range(0,N)])
+                value = random.random() * (sup - inf)
             result[k] = int(round(value))
         return result
 
