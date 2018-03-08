@@ -3,10 +3,10 @@ import pprint
 import json
 import datetime
 
-def save_results(results,exp_name):
+def save_results(results,exp_name,ip='localhost'):
     clean_results(results)
     results["date"] = datetime.datetime.now().strftime("%d/%m-%H:%M")
-    c = get_collection(exp_name)
+    c = get_collection(exp_name,ip)
     c.insert_one(results)
 
 def clean_results(results):
@@ -37,7 +37,6 @@ def format_entries(results):
         if k == "video_id":
             results[k] = v[0]
 
-
 def must_become_float(k):
     return k != "video_id" and k != "true_resolutions" \
             and "MOS" not in k and k != "stallingInfo"
@@ -50,7 +49,7 @@ def check_and_del(key,dic):
     if key in dic.keys():
         del(dic[key])
 
-def get_collection(collec,db="jarjarbinge"):
-	client = MongoClient('138.96.65.33', 27017)
+def get_collection(collec,ip,db="jarjarbinge"):
+	client = MongoClient(ip, 27017)
 	db = client[db]
 	return db[collec]

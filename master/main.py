@@ -17,6 +17,7 @@ from results_writer import *
 from db_saver import *
 
 HOST_NAME="127.0.0.1"
+DB_IP = '138.96.65.33'
 PORT_NUMBER = 8000
 EXP_NAME = 'mongo_test_2'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
@@ -43,7 +44,7 @@ def launch_one_experiment(verbose=True):
     results =\
             launch_local_server_and_wait_for_results(verbose=verbose,very_verbose=False)
     #write_results(results,qos,RESULTS_FILE)
-    save_results(results,EXP_NAME)
+    save_results(results,EXP_NAME,ip=DB_IP)
 
 def write_results(results,qos,results_file):
     with open(results_file,"a") as f:
