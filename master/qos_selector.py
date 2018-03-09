@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import pandas as pd
 import itertools
 
 class QosSelector:
@@ -15,12 +16,16 @@ class QosSelector:
                 'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
                 'dl_jit_ms': None, 'ul_los': None}
         self.sup_inf = \
-                {'dl_los': [0,40], 'dl_del_ms': [1,1500],
+                {'dl_los': [0,21], 'dl_del_ms': [1,750],
                         'ul_rat_kb': [0,8000], 'ul_jit_ms': [0,300],
-                    'ul_del_ms': [1,1500], 'dl_rat_kb': [0,8000],
-                        'dl_jit_ms': [0,300], 'ul_los': [0,40]}
+                    'ul_del_ms': [1,750], 'dl_rat_kb': [0,8000],
+                        'dl_jit_ms': [0,300], 'ul_los': [0,21]}
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
+
+    def simulate(self,n):
+        l = [self.random_point() for i in range(0,n)]
+        return pd.DataFrame(data=l)
 
     def generate_points(self):
         result = {}
@@ -32,19 +37,25 @@ class QosSelector:
                     [i for i in range(inf,sup,int((sup-inf)/n))]
         return result
 
-    def random_point(self,N=8):
+    def random_point(self,proba_clear_m=0,N=8):
         result = {}
         for k, sup_inf in self.sup_inf.items():
             inf = sup_inf[0]
             sup = sup_inf[1]
             #value = random.randint(inf,sup)
+            clear_metric = (random.random() < proba_clear_m)
             if 'kb' not in k:
-                #value = random.choice([i/10e2 for i in np.logspace(0,3,num=N)]) * (sup-inf)
-                value = random.random() * (sup - inf)
+                if clear_metric:
+                    value = inf
+                else:
+                    value = random.random() * (sup - inf)
             else:
-                #value = random.choice([125*pow(2,i) for i in range(0,N)])
-                value = random.random() * (sup - inf)
-            result[k] = int(round(value))
+                if clear_metric:
+                    value = sup
+                else:
+                    value = random.random() * (sup - inf)
+
+            result[k] = value
         return result
 
     def create_iterator(self):
