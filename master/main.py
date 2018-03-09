@@ -41,10 +41,14 @@ def launch_one_experiment(verbose=True):
     qos = get_QoS(verbose=verbose)
     send_qos_to_traffic_controller(qos)
     send_go_to_qoe_measurer()
-    results =\
+    qoe_results =\
             launch_local_server_and_wait_for_results(verbose=verbose,very_verbose=False)
+    results = {**qos,**qoe_results}
     #write_results(results,qos,RESULTS_FILE)
-    save_results(results,EXP_NAME,ip=DB_IP)
+    try:
+        save_results(results,EXP_NAME,ip=DB_IP)
+    except:
+        save_results(results,EXP_NAME,ip='localhost')
 
 def write_results(results,qos,results_file):
     with open(results_file,"a") as f:
