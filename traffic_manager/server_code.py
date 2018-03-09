@@ -32,12 +32,15 @@ def MakeHandlerClassFromArgv(init_args):
             if QoSHandler.tc == None:
                QoSHandler.tc = TrafficController()
             QoSHandler.tc.reset_all()
-            received_net_cond = self.get_net_conditions()
-            #pprint.pprint(received_net_cond)
-            TrafficController.net_conditions = received_net_cond
-            #The network conditions of the machine are chenged HERE
-            #os.system("killall chrome")
-            QoSHandler.tc.set_conditions()
+            if self.path != "/clear":
+                received_net_cond = self.get_net_conditions()
+                #pprint.pprint(received_net_cond)
+                TrafficController.net_conditions = received_net_cond
+                #The network conditions of the machine are chenged HERE
+                #os.system("killall chrome")
+                QoSHandler.tc.set_conditions()
+            else:
+                print("GOT CLEAR!!")
             self.send_response(200)
             self.send_header("Content-type","application/json")
             self.end_headers()

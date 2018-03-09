@@ -17,10 +17,12 @@ from results_writer import *
 from db_saver import *
 
 HOST_NAME="127.0.0.1"
-DB_IP = '138.96.65.33'
+DB_IP = '138.96.65.33/acqua-db'
+DB_IP = 'localhost'
 PORT_NUMBER = 8000
 EXP_NAME = 'linear_rand_1'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
+ALLWAYS_CLEAN_QOS=True
 
 def main(fault_tolerant=False):
     """Launches experiment until Ctrl+C"""
@@ -31,11 +33,11 @@ def main(fault_tolerant=False):
             launch_one_experiment()
         except KeyboardInterrupt:
             not_interrupted=False
-        except Exception as e:
-            if fault_tolerant:
-                print("Got one error : "+str(e))
-            else:
-                raise e
+        #except Exception as e:
+        #    if fault_tolerant:
+        #        print("Got one error : "+str(e))
+        #    else:
+        #        raise e
 
 def launch_one_experiment(verbose=True):
     qos = get_QoS(verbose=verbose)
@@ -43,11 +45,18 @@ def launch_one_experiment(verbose=True):
     send_go_to_qoe_measurer()
     qoe_results =\
             launch_local_server_and_wait_for_results(verbose=verbose,very_verbose=False)
-    #write_results(results,qos,RESULTS_FILE)
+    send_clear_to_tc()
     try:
         save_results(qoe_results,qos,EXP_NAME,ip=DB_IP)
-    except:
-        save_results(qoe_results,qos,EXP_NAME,ip='localhost')
+    except Exception as e:
+        pprint.pprint(e)
+        try:
+            save_results(qoe_results,qos,EXP_NAME,ip='localhost',must_format=False)
+        except Exception as e:
+            pprint.pprint(e)
+            results = {**qos,**qoe_results}
+            write_results(results,qos,RESULTS_FILE)
+            raise e
 
 def write_results(results,qos,results_file):
     with open(results_file,"a") as f:
@@ -83,7 +92,13 @@ def send_qos_to_traffic_controller(qos,verbose=True):
     qos_response  = r.content.decode('utf-8')
     qos_response  = json.loads(r.content.decode('utf-8'))
 
-def get_QoS(verbose=True,clear_qos_only=False):
+def send_clear_to_tc():
+    r = requests.post("http://127.0.0.1:8002/clear")
+    print("SENT CLEAR!!")
+    qos_response  = r.content.decode('utf-8')
+    qos_response  = json.loads(r.content.decode('utf-8'))
+
+def get_QoS(verbose=True,clear_qos_only=ALLWAYS_CLEAN_QOS):
     qos_selector = QosSelector(10)
     qos = qos_selector.random_point()
     #Following are line to get a static qos conf
