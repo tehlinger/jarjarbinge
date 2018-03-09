@@ -3,8 +3,9 @@ import pprint
 import json
 import datetime
 
-def save_results(results,exp_name,ip='localhost'):
-    clean_results(results)
+def save_results(qoe_results,qos,exp_name,ip='localhost'):
+    clean_results(qoe_results)
+    results = {**qos,**qoe_results}
     results["date"] = datetime.datetime.now().strftime("%d/%m-%H:%M")
     c = get_collection(exp_name,ip)
     c.insert_one(results)

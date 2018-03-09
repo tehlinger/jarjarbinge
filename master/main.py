@@ -43,12 +43,11 @@ def launch_one_experiment(verbose=True):
     send_go_to_qoe_measurer()
     qoe_results =\
             launch_local_server_and_wait_for_results(verbose=verbose,very_verbose=False)
-    results = {**qos,**qoe_results}
     #write_results(results,qos,RESULTS_FILE)
     try:
-        save_results(results,EXP_NAME,ip=DB_IP)
+        save_results(qoe_results,qos,EXP_NAME,ip=DB_IP)
     except:
-        save_results(results,EXP_NAME,ip='localhost')
+        save_results(qoe_results,qos,EXP_NAME,ip='localhost')
 
 def write_results(results,qos,results_file):
     with open(results_file,"a") as f:
