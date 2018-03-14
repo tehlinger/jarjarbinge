@@ -17,14 +17,14 @@ from results_writer import *
 from db_saver import *
 
 HOST_NAME="127.0.0.1"
-DB_IP = '138.96.65.33/acqua-db'
+#DB_IP = '138.96.65.33/acqua-db'
 DB_IP = 'localhost'
 PORT_NUMBER = 8000
-EXP_NAME = 'linear_rand_1'
+EXP_NAME = 'test'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
 ALLWAYS_CLEAN_QOS=True
 
-def main(fault_tolerant=False):
+def main(fault_tolerant=True):
     """Launches experiment until Ctrl+C"""
     server_class = server_code.StoppableHttpServer
     not_interrupted = True
@@ -33,11 +33,11 @@ def main(fault_tolerant=False):
             launch_one_experiment()
         except KeyboardInterrupt:
             not_interrupted=False
-        #except Exception as e:
-        #    if fault_tolerant:
-        #        print("Got one error : "+str(e))
-        #    else:
-        #        raise e
+        except Exception as e:
+            if fault_tolerant:
+                print("Got one error : "+str(e))
+            else:
+                raise e
 
 def launch_one_experiment(verbose=True):
     qos = get_QoS(verbose=verbose)
@@ -48,6 +48,9 @@ def launch_one_experiment(verbose=True):
     send_clear_to_tc()
     try:
         save_results(qoe_results,qos,EXP_NAME,ip=DB_IP)
+        #write_results(results,qos,RESULTS_FILE)
+    except ValueError as e:
+        raise e
     except Exception as e:
         pprint.pprint(e)
         try:
@@ -65,7 +68,7 @@ def write_results(results,qos,results_file):
                 line_out_of_dict(results,qoe_metrics)+"\n"
         f.write(line)
 
-def launch_local_server_and_wait_for_results(verbose=True,very_verbose=False):
+def launch_local_server_and_wait_for_results(verbose=True,very_verbose=True):
     HandlerClass = server_code.MakeHandlerClassFromArgv(sys.argv)
     try:
         results = server_code.StoppableHttpServer.run_while_true(handler_class=HandlerClass)
@@ -94,7 +97,6 @@ def send_qos_to_traffic_controller(qos,verbose=True):
 
 def send_clear_to_tc():
     r = requests.post("http://127.0.0.1:8002/clear")
-    print("SENT CLEAR!!")
     qos_response  = r.content.decode('utf-8')
     qos_response  = json.loads(r.content.decode('utf-8'))
 
@@ -104,6 +106,7 @@ def get_QoS(verbose=True,clear_qos_only=ALLWAYS_CLEAN_QOS):
     #Following are line to get a static qos conf
     if clear_qos_only:
         qos = QosSelector.get_clear_qos()
+        qos["dl_rat_kb"] = 800
     if verbose:
         print("=================================")
         print("QOS : ")
@@ -121,8 +124,10 @@ def calc_MOS(results):
             for codec, score in mos:
                 cod_key = 'MOS_'+codec
                 results[cod_key] = score
+    except ValueError as e:
+        raise e
     except Exception as e:
-        print("Got one error : "+str(e))
+        print("Got one error : "+type(e)+" : "+str(e))
         mos = 0
         results['ITU_mos'] = mos
     return results
@@ -145,8 +150,6 @@ def get_res_for_MOS(results):
 
 if __name__== "__main__":
     main()
-
-#def save_results(results):
 
 #Code to change the rate after a few seconds
 #time.sleep(1)

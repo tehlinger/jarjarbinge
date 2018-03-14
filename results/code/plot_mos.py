@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 from numpy import reshape
+import math
 
 ids = [
     "bUhdSs0VK9c",
@@ -28,6 +29,11 @@ def mos_cdf(df,mos_field,title=None,ax=None):
     else:
         plt.plot(x,y)
     #sns.kdeplot(df[mos_field],label=mos_field.split('_')[1])
+
+def add_mean_mos(df):
+    mos_headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
+    df['MOS'] = df.apply(lambda x : sum([\
+            x[i]*0.25 for i in mos_headers]),axis=1)
 
 def by_vid_mos(df,mos_field="MOS",split_vids=True):
     if split_vids:
@@ -77,3 +83,9 @@ def violins(df):
     plt.suptitle("Distribution of the MOS for each point in each metric",
             fontsize=20)
     plt.show()
+
+def meas_per_mos(df):
+    if "MOS" not in df.columns:
+        add_mean_mos(df)
+    df["category"] = df.MOS.apply(lambda x : 0 if pd.isnull(x) else math.floor(x))
+    return df[["video_id","category"]].groupby("category").count()

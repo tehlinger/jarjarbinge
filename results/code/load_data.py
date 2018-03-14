@@ -1,7 +1,13 @@
 import pandas as pd
 
-RESULT_FILES = ["../data/grid_mos_1_A.csv",
-                "../data/grid_mos_1_B.csv"]
+RESULT_FILES = [
+                "../data/2A_clean_linrand.json",
+                "../data/2B_clean_linrand.json",
+                "../data/3B_clean_linrand.json",
+                "../data/3A_clean_linrand.json",
+                "../data/4B_clean_linrand.json",
+                "../data/4A_clean_linrand.json"
+                ]
 
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
 
@@ -9,16 +15,21 @@ def load_col_names(f):
     with open(f,'r') as f :
         return f.readline()[:-1].split(',')
 
-def load_results(files : 'str_list'=RESULT_FILES,header_file : 'file_path' = '../data/header.txt'):
-    df = load_csv(files,header_file)
-    fill_nans(df)
+def load_results(files : 'str_list'=RESULT_FILES,header_file : 'file_path' =
+        '../data/header.txt',is_csv=True):
+    df = load_csv(is_csv,files,header_file)
+    df = fill_nans(df)
     return df
 
-def load_csv(files : 'str_list'=RESULT_FILES,header_file : 'file_path' = '../data/header.txt'):
+def load_csv(is_csv,files=RESULT_FILES,\
+        header_file='../data/header.txt'):
     columns = load_col_names(header_file)
     result = None
     for fp in files:
-        df = pd.read_csv(fp,names=columns)
+        if is_csv:
+            df = pd.read_csv(fp,names=columns)
+        else:
+            df = pd.read_json(fp,lines=True)
         if result is not None:
             result = result.append(df)
         else:

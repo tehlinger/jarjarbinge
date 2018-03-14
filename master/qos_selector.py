@@ -55,7 +55,7 @@ class QosSelector:
                 else:
                     value = random.random() * (sup - inf)
 
-            result[k] = value
+            result[k] = round(int(value))
         return result
 
     def create_iterator(self):
