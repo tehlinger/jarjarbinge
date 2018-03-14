@@ -24,8 +24,6 @@ def clean_results(results):
 
 def format_entries(results):
     for k,v in results.items():
-        print("KEY : "+k)
-        pprint.pprint(v)
         if must_become_float(k):
             try:
                 results[k] = float(v[0])
@@ -33,22 +31,25 @@ def format_entries(results):
                 results[k] = None
         else:
             if k == "true_resolutions" or k == 'stallingInfo':
-                to_convert = results[k]
-                if k == "true_resolutions":
-                    if len(to_convert) == 1:
-                        results[k] = [json.loads(to_convert[0])]
-                    else:
-                        l =  [i for i in to_convert[0]]
-                        d =  [json.loads(i) for i in l]
-                        results[k] = [i for i in lst
-                         if '0x0' not in i['true_res']]
-                else:
-                    if results[k] is not None:
-                        if results [k][0] is not None:
-                            if type(results[k][0]) == str:
-                                results[k] = None
-                            else:
-                                results[k] = [i for i in json.loads(to_convert[0])]
+                to_convert = str(results[k])
+                #if k == 'stallingInfo':
+                #    test = str('['+results[k][0]+']')
+                #    #print(test)
+                #    #print("SEE : ")
+                #    #pprint.pprint(json.loads(test))
+                #if k == "true_resolutions":
+                #    if len(to_convert) == 1:
+                #        results[k] = [json.loads(to_convert[0])]
+                #    else:
+                #        results[k] =  [str(test)]
+                results[k] = to_convert
+                #else:
+                #    if results[k] is not None:
+                #        if results [k][0] is not None:
+                #            if type(results[k][0]) == str:
+                #                results[k] = None
+                #            else:
+                #                results[k] = [i for i in json.loads(to_convert[0])]
         if k == "video_id":
             results[k] = v[0]
 
@@ -68,6 +69,12 @@ def get_collection(collec,ip,db="jarjarbinge"):
 	client = MongoClient(ip, 27017)
 	db = client[db]
 	return db[collec]
+
+def export_results(output,collec="rand_linear_3",ip="localhost",db="jarjarbinge"):
+    c = get_collection(collec,ip,db=db)
+    with open(output,"w") as f:
+        for entry in c.find():
+            f.write(str(entry)+"\n")
 
 def test():
     d={'bufferSizeWhenStart':0.0,'date':'09/03-09:30','dl_del_ms':1,'dl_jit_ms':None,'dl_los':0,'dl_rat_kb':None,'dur':59.426,'end_time':0.0,'getVideoLoadedFraction':0.0,'join_time':0.0,'player_load_time':310000.0,'totalStallDuration':0.0,'ul_del_ms':1,'ul_jit_ms':None,'ul_los':None,'ul_rat_kb':None}
