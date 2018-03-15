@@ -30,11 +30,6 @@ def mos_cdf(df,mos_field,title=None,ax=None):
         plt.plot(x,y)
     #sns.kdeplot(df[mos_field],label=mos_field.split('_')[1])
 
-def add_mean_mos(df):
-    mos_headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
-    df['MOS'] = df.apply(lambda x : sum([\
-            x[i]*0.25 for i in mos_headers]),axis=1)
-
 def by_vid_mos(df,mos_field="MOS",split_vids=True):
     if split_vids:
         fig,ax = plt.subplots()
