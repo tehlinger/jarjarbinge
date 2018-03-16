@@ -50,6 +50,7 @@ def load_MOS(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
     add_mean_mos(df)
     df.loc[df.join_time == 310000,"MOS"] = 1
     df.loc[df.player_load_time == 310000,"MOS"] = 1
+    df.at[pd.isnull(df.true_resolutions),"true_resolutions"] = None
     return df
 
 def load_triple_MOS(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =

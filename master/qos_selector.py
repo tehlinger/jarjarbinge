@@ -39,6 +39,7 @@ class QosSelector:
 
     def random_point(self,proba_clear_m=0,N=8):
         result = {}
+        n = 0
         for k, sup_inf in self.sup_inf.items():
             inf = sup_inf[0]
             sup = sup_inf[1]
@@ -46,17 +47,23 @@ class QosSelector:
             clear_metric = (random.random() < proba_clear_m)
             if 'kb' not in k:
                 if clear_metric:
+                    n += 1
                     value = inf
                 else:
                     value = random.random() * (sup - inf)
             else:
                 if clear_metric:
+                    n += 1
                     value = sup
                 else:
                     value = random.random() * (sup - inf)
 
             result[k] = round(int(value))
+        result["n"] = n
         return result
+
+    def get_list(self,p,n):
+        return [self.random_point(p) for i in range(0,n)]
 
     def create_iterator(self):
         indexes = [list(range(0,self.pts_per_metric)) for i in range(0,8)]
