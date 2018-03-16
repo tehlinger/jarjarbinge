@@ -46,10 +46,10 @@ def by_vid_mos(df,mos_field="MOS",split_vids=True):
         mos_cdf(df,mos_field)
 
 def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]):
+    sns.set()
     for h in headers:
         mos_cdf(df,h)
     plt.title("KDE plot of the MOS for each codec (1970 points)",fontsize=22)
-    sns.set()
     plt.legend(fontsize=18)
     plt.xlabel("MOS",fontsize=18)
     plt.ylabel("Distribution",fontsize=18)
