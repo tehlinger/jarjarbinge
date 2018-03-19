@@ -13,7 +13,9 @@ V2_RESULT_FILES = [
         "../data/v2/Av2_0_clean.json",
         "../data/v2/Bv2_0_clean.json",
         "../data/v2/Av2_2_clean.json",
-        "../data/v2/Bv2_2_clean.json"
+        "../data/v2/Av2_2_clean.json",
+        "../data/v2/Av2_3_clean.json",
+        "../data/v2/Bv2_3_clean.json"
         ]
 
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]

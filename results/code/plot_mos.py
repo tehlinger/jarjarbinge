@@ -1,4 +1,5 @@
 import array
+import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -47,10 +48,14 @@ def by_vid_mos(df,mos_field="MOS",split_vids=True):
 
 def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]):
     sns.set()
+    n = df.shape[0]
     for h in headers:
         mos_cdf(df,h)
-    plt.title("KDE plot of the MOS for each codec (1970 points)",fontsize=22)
+    plt.title("KDE plot of the MOS for each codec ("+str(n)+" points)",fontsize=22)
     plt.legend(fontsize=18)
+    ax = plt.gca()
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+    ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     plt.xlabel("MOS",fontsize=18)
     plt.ylabel("Distribution",fontsize=18)
     plt.show()
