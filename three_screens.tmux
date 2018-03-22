@@ -22,4 +22,4 @@ tmux send-keys "python3 main.py" C-m
 tmux select-pane -t 2
 tmux send-keys "sudo python3 main.py" C-m
 
-#tmux -2 attach-session -t $SESSION
+tmux -2 attach-session -t $SESSION
