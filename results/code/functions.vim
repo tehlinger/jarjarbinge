@@ -10,6 +10,7 @@
 #Remove the first surrounding quoes in lists
 %s/: "\["{"/: \[{"/g
 %s/}"\]", "/}\], "/g
+%s/}"\]" }/}\] }/g
 
 ####From mongoexport code####
 

@@ -51,7 +51,7 @@ def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]):
     n = df.shape[0]
     for h in headers:
         mos_cdf(df,h)
-    plt.title("KDE plot of the MOS for each codec ("+str(n)+" points)",fontsize=22)
+    plt.title("MOS for each codec ("+str(n)+" points)",fontsize=22)
     plt.legend(fontsize=18)
     ax = plt.gca()
     ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))

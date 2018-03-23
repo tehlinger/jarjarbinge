@@ -16,11 +16,13 @@ from mos_p_1203 import get_itu_mos
 from results_writer import *
 from db_saver import *
 
+P = 0.5
+
 HOST_NAME="127.0.0.1"
 #DB_IP = '138.96.65.33/acqua-db'
 DB_IP = 'localhost'
 PORT_NUMBER = 8000
-EXP_NAME = 'v2_4'
+EXP_NAME = 'v2_41b'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
 ALLWAYS_CLEAN_QOS=False
 
@@ -102,7 +104,7 @@ def send_clear_to_tc():
 
 def get_QoS(verbose=True,clear_qos_only=ALLWAYS_CLEAN_QOS):
     qos_selector = QosSelector(10)
-    qos = qos_selector.random_point()
+    qos = qos_selector.random_point(proba_clear_m=P)
     #Following are line to get a static qos conf
     if clear_qos_only:
         qos = QosSelector.get_clear_qos()

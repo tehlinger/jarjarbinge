@@ -23,8 +23,8 @@ class QosSelector:
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
 
-    def simulate(self,n):
-        l = [self.random_point() for i in range(0,n)]
+    def simulate(self,n,p=0):
+        l = [self.random_point(proba_clear_m=p) for i in range(0,n)]
         return pd.DataFrame(data=l)
 
     def generate_points(self):

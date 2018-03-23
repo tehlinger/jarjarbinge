@@ -1,8 +1,35 @@
 import pandas as pd
 import numpy as np
+import math
 
-from load_data import load_results
+from load_data import load_results,load_MOS
 
+qos_metrics = ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms',
+           'ul_del_ms','dl_rat_kb', 'dl_jit_ms', 'ul_los']
+
+def build_binary_dataset(df):
+    """
+    Returns a DF with qos_metrics only and a
+    target variable "LAUNCHED" which is true if the
+    video launched
+    """
+    result = df.copy()
+    result["LAUNCHED"] = \
+            result.apply(lambda x : (x["player_load_time"] < 3e5) and\
+            (x["join_time"] < 3e5) ,axis=1)
+    l = qos_metrics + ["LAUNCHED"]
+    return result[l]
+
+
+def get_applicative_df_only(df):
+    df = launched_vid(df)
+    res = df[list(set(df.columns)#-set(qos_metrics)\
+            -set(["date","video_id","n","dur"])
+            -set(["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]))]
+    add_app_features(res)
+    return\
+            res[list(set(res.columns)\
+            -set(['true_resolutions','totalStallDuration','stallingInfo']))]
 
 def meas_per_mos(df):
     if "MOS" not in df.columns:
@@ -21,12 +48,12 @@ def add_app_features(df):
     #stalling
     add_stalling_feat(df)
     #Res
-    df = add_res_features(df)
+    df = add_res_feat(df)
     return df
 
 def add_stalling_feat(df):
     df[["stall_tot","stall_n","stall_max"]] = \
-            df.apply(extract_stall_info,axis=1)
+            df.stallingInfo.apply(extract_stall_info)
 
 def add_res_feat(df):
     df[["switches_nb","switches_freq","res_min",\

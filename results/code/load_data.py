@@ -10,12 +10,16 @@ V1_RESULT_FILES = [
                 ]
 
 V2_RESULT_FILES = [
-        "../data/v2/Av2_0_clean.json",
-        "../data/v2/Bv2_0_clean.json",
-        "../data/v2/Av2_2_clean.json",
-        "../data/v2/Av2_2_clean.json",
-        "../data/v2/Av2_3_clean.json",
-        "../data/v2/Bv2_3_clean.json"
+        #"../data/v2/Av2_0_clean.json",
+        #"../data/v2/Bv2_0_clean.json",
+        #"../data/v2/Av2_2_clean.json",
+        #"../data/v2/Av2_2_clean.json",
+        #"../data/v2/Av2_3_clean.json",
+        #"../data/v2/Bv2_3_clean.json",
+        "../data/v2/biais_A_v2_4_clean.json",
+        "../data/v2/biais_B_v2_4_clean.json",
+        "../data/v2/biais_A_v2_41_clean.json",
+        "../data/v2/biais_B_v2_41_clean.json"
         ]
 
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
@@ -45,6 +49,13 @@ def load_csv(is_csv,files=V1_RESULT_FILES,\
         else:
             result = df
     return result
+
+def export_for_ml(df,output):
+    cols = df.columns
+    excluded = [i for i in df.columns if "MOS_" in i]+["date"]
+    out_cols = list(set(cols) - set(excluded))
+    df.to_csv(output,columns=out_cols,index=False)
+
 
 def load_MOS(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
         '../data/header_mos.txt'):
