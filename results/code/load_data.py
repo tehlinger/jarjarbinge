@@ -17,9 +17,11 @@ V2_RESULT_FILES = [
         #"../data/v2/Av2_3_clean.json",
         #"../data/v2/Bv2_3_clean.json",
         "../data/v2/biais_A_v2_4_clean.json",
-        "../data/v2/biais_B_v2_4_clean.json",
         "../data/v2/biais_A_v2_41_clean.json",
-        "../data/v2/biais_B_v2_41_clean.json"
+        "../data/v2/biais_A_v2_42_clean.json",
+        "../data/v2/biais_B_v2_4_clean.json",
+        "../data/v2/biais_B_v2_41_clean.json",
+        "../data/v2/biais_B_v2_42_clean.json"
         ]
 
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]

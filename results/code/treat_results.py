@@ -171,6 +171,7 @@ def custom_legend(ax):
                 '5%<x<=10%','10%<x<=20%','20%<x<=40%','40%<x<=100%']),
             loc='center')
 
+    #OTHMANE : CUSTOMIZATION COLORBAR
 def custom_mos_legend():
     plt.subplot(4,4,13)
     c_map =  plt.get_cmap('RdYlGn')
