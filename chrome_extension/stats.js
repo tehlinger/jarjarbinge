@@ -2,8 +2,10 @@ var panel = null
 var panel_never_loaded = true;
 var last_res = null;
 
+//EXTENSION="ophdohnncbmfeikcgcjopnploippgbjk"
 EXTENSION = "mdaahbifddgcfhaibfkfpeiombojjfhe"
 CHECK_FREQUENCY = Math.floor((1000/24)*0.75)
+var current_frame_index = 0
 
 //If t doesn't contain '@', it means that the
 //'Stats for nerds' panel is not ready yet.
@@ -19,7 +21,12 @@ function different_res(d1,d2){
 //Sends the resolution to the extension background,
 //the main part of the program
 function send_res(r){
-	chrome.runtime.sendMessage(EXTENSION,{'cmd': 'new_res','res':res_dic});
+	chrome.runtime.sendMessage(EXTENSION,{'cmd': 'new_res','res':r});
+}
+
+//Sends the content of the "Connection speed
+function send_est_rate(r){
+	chrome.runtime.sendMessage(EXTENSION,{'cmd': 'est_rate','res':r});
 }
 
 //Extract the interesting data out of the "Stats for nerds"
@@ -43,8 +50,23 @@ function parse_panel(panel){
 	panel_html = panel[0].childNodes[1];
 	res_text = panel_html.children[2].textContent;
 	if(res_is_loaded(res_text)){
-		dic = resolution_data(res_text,panel_html)
+		est_rate = panel_html.childNodes[9].childNodes[1].innerText
+		dic = resolution_data(res_text,panel_html);
 		return dic;
+	}
+	else{
+		return null;
+	}
+}
+
+//Inspects the "Stats for nerds" panel HTML and returns
+//null if it's not ready. Otherwise, returns the connection Speed part
+function extract_est_rate(panel){
+	panel_html = panel[0].childNodes[1];
+	res_text = panel_html.children[2].textContent;
+	if(res_is_loaded(res_text)){
+		est_rate = panel_html.childNodes[9].childNodes[1].innerText
+		return parseInt(est_rate.split(' ')[0])
 	}
 	else{
 		return null;
@@ -54,12 +76,21 @@ function parse_panel(panel){
 //Keeps trying to inspects the "Stats for nerds" panel
 //when it's ready, sends the data
 function keep_trying_to_get_panel(){
+	//On envoie le débit toutes les N frames
+	SEND_RAT_EACH = 20
 	d = document.getElementsByClassName('html5-video-info-panel');
 	//Panel not ready
 	if(d.length != 0){
 	//Panel ready, but data maybe not loaded.
 		res_dic = parse_panel(d)
 		if (res_dic != null){
+			//global var
+			current_frame_index += 1;
+			if (current_frame_index % SEND_RAT_EACH == 0){
+				current_frame_index = 0;
+				est_rate = extract_est_rate(d);
+				send_est_rate(est_rate);
+			}
 			if (panel_never_loaded ||
 				different_res(last_res,res_dic)){
 					panel_never_loaded = false;
