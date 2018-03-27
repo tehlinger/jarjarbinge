@@ -4,6 +4,7 @@ import json
 import datetime
 
 def save_results(qoe_results,qos,exp_name,ip='localhost',must_format=True):
+    pprint.pprint(qoe_results)
     if must_format:
         clean_results(qoe_results)
     d = datetime.datetime.now().strftime("%d/%m-%H:%M")
@@ -30,32 +31,18 @@ def format_entries(results):
             except :
                 results[k] = None
         else:
-            if k == "true_resolutions" or k == 'stallingInfo':
+            if k == "true_resolutions" or k == 'stallingInfo'\
+                    or k == 'est_rates':
                 to_convert = str(results[k])
-                #if k == 'stallingInfo':
-                #    test = str('['+results[k][0]+']')
-                #    #print(test)
-                #    #print("SEE : ")
-                #    #pprint.pprint(json.loads(test))
-                #if k == "true_resolutions":
-                #    if len(to_convert) == 1:
-                #        results[k] = [json.loads(to_convert[0])]
-                #    else:
-                #        results[k] =  [str(test)]
-                results[k] = to_convert
-                #else:
-                #    if results[k] is not None:
-                #        if results [k][0] is not None:
-                #            if type(results[k][0]) == str:
-                #                results[k] = None
-                #            else:
-                #                results[k] = [i for i in json.loads(to_convert[0])]
+                if k == 'est_rates':
+                    print("GOT IT : "+str(results[k]))
         if k == "video_id":
             results[k] = v[0]
 
 def must_become_float(k):
     return k != "video_id" and k != "true_resolutions" \
-            and "MOS" not in k and k != "stallingInfo"
+            and "MOS" not in k and k != "stallingInfo"\
+            and k != "est_rates"
 
 def delete_keys(k_list,dic):
     for k in k_list:

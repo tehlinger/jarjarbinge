@@ -22,9 +22,10 @@ HOST_NAME="127.0.0.1"
 #DB_IP = '138.96.65.33/acqua-db'
 DB_IP = 'localhost'
 PORT_NUMBER = 8000
-EXP_NAME = 'v2_42b'
+EXP_NAME = 'v2_43b'
+EXP_NAME = 'useless'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
-ALLWAYS_CLEAN_QOS=False
+ALLWAYS_CLEAN_QOS=True
 
 def main(fault_tolerant=True):
     """Launches experiment until Ctrl+C"""
@@ -108,7 +109,6 @@ def get_QoS(verbose=True,clear_qos_only=ALLWAYS_CLEAN_QOS):
     #Following are line to get a static qos conf
     if clear_qos_only:
         qos = QosSelector.get_clear_qos()
-        qos["dl_rat_kb"] = 800
     if verbose:
         print("=================================")
         print("QOS : ")

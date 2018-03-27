@@ -1,4 +1,5 @@
 import pandas as pd
+import math
 
 V1_RESULT_FILES = [
                 "../data/2A_clean_linrand.json",
@@ -29,6 +30,32 @@ MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
 def load_col_names(f):
     with open(f,'r') as f :
         return f.readline()[:-1].split(',')
+
+def compare_pcs(filenames=V2_RESULT_FILES,\
+        a_indexes=[1,2],\
+        b_indexes=[4,5]):
+    """
+    indexes : indexes of the filenames of each computer
+    """
+    a_files = [filenames[i] for i in a_indexes]
+    a_df = load_csv(False,a_files)
+    add_mean_mos(a_df)
+    b_files = [filenames[i] for i in b_indexes]
+    b_df = load_csv(False,b_files)
+    add_mean_mos(b_df)
+    return {"a":a_df,"b":b_df}
+
+def check_files():
+    for f in V2_RESULT_FILES:
+        df = pd.read_json(f,lines=True)
+        df = launched_vid(df)
+        add_mean_mos(df)
+        df = df.loc[~pd.isnull(df.MOS)]
+        a = df.MOS
+        t = st.t.interval(0.95, len(a)-1, loc=np.mean(a), scale=st.sem(a))
+        t = ("{0:.2f}".format(t[0]),"{0:.2f}".format(t[1]))
+        print(f.split('/')[-1].split('.')[0][-12:]\
+                +":"+"n="+str(len(a)).zfill(4)+" i="+str(t))
 
 def load_results(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
         '../data/header.txt'):

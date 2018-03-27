@@ -24,12 +24,13 @@ def build_binary_dataset(df):
 def get_applicative_df_only(df):
     df = launched_vid(df)
     res = df[list(set(df.columns)#-set(qos_metrics)\
-            -set(["date","video_id","n","dur"])
+            -set(["date","video_id","n","dur","_id"])
             -set(["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]))]
     add_app_features(res)
     return\
             res[list(set(res.columns)\
-            -set(['true_resolutions','totalStallDuration','stallingInfo']))]
+            -set(['true_resolutions','totalStallDuration','stallingInfo',\
+            "getVideoLoadedFraction"]))]
 
 def meas_per_mos(df):
     if "MOS" not in df.columns:
@@ -75,7 +76,8 @@ def extract_res_info(entry):
     """Given an entry, returns
     <nb_switches,frequency>
     """
-    if entry['true_resolutions'] is None:
+    if entry['true_resolutions'] is None \
+            or isinstance(entry['true_resolutions'],str):
         return pd.Series((0,0,0,0,0))
     else:
         of_interest = [i for i in entry['true_resolutions']\

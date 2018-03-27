@@ -22,13 +22,17 @@ def get_bitrates(v_id):
     df = df.loc[df.web_format == "mp4"]
     return "-".join(list(df.bitrate)[-3:])
 
-def mos_cdf(df,mos_field,title=None,ax=None):
+def mos_cdf(df,mos_field,legend,title=None,ax=None):
     x = array.array('f',list(df[mos_field].sort_values()))
     y = [i/len(x) for i in range(1,len(x)+1)]
     if title is not None:
-        ax.plot(x,y,label=get_bitrates(title)+"("+str(title)+")")
+        if legend is None:
+            lbl = get_bitrates(title)+"("+str(title)+")"
+        else:
+            lbl=legend
+        ax.plot(x,y,label=legend)
     else:
-        plt.plot(x,y)
+        plt.plot(x,y,label=legend)
     #sns.kdeplot(df[mos_field],label=mos_field.split('_')[1])
 
 def by_vid_mos(df,mos_field="MOS",split_vids=True):
@@ -46,18 +50,28 @@ def by_vid_mos(df,mos_field="MOS",split_vids=True):
     else:
         mos_cdf(df,mos_field)
 
-def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]):
+def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"],\
+        legend=None):
     sns.set()
     n = df.shape[0]
     for h in headers:
-        mos_cdf(df,h)
-    plt.title("MOS for each codec ("+str(n)+" points)",fontsize=22)
+        mos_cdf(df,h,legend)
+    #plt.title("MOS for each codec ("+str(n)+" points)",fontsize=22)
     plt.legend(fontsize=18)
     ax = plt.gca()
     ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
     ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     plt.xlabel("MOS",fontsize=18)
     plt.ylabel("Distribution",fontsize=18)
+    #plt.show()
+
+def compare_MOS(a_df,b_df,df):
+    headers = ["MOS"]
+    plot_all_mos(a_df,["MOS"],legend="computer A")
+    plot_all_mos(b_df,["MOS"],legend="computer B")
+    plot_all_mos(df,["MOS"],legend="Both")
+    n = a_df.shape[0]+b_df.shape[0]
+    plt.title("MOS for each computer ("+str(n)+" points)",fontsize=22)
     plt.show()
 
 def violins(df):

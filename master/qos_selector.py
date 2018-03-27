@@ -94,31 +94,3 @@ class QosSelector:
             result[metric] = value
         return result
 
-
-
-def get_qos():
-    qos = \
-            {'dl_los': None, 'dl_del_ms': None, 'ul_rat_kb': None,\
-            'ul_jit_ms': None, 'ul_del_ms': None, 'dl_rat_kb': None,\
-            'dl_jit_ms': None, 'ul_los': None}
-    r1= random.randint(1,3)
-    if r1== 1 :
-        r1= 0
-    if r1== 2:
-        r1= random.randint(100,800)/100
-    if r1== 3:
-         r1= random.randint(900,3000)/100
-    r = random.randint(1,3)
-    if r == 1 :
-        r = random.randint(10,800)
-    if r == 2:
-        r = random.randint(800,3000)
-    if r == 3:
-         r = random.randint(3000,30000)
-    qos['ul_del_ms'] =1
-    qos['ul_jit_ms'] = 2000
-    #qos['dl_los'] = r1
-    print("======")
-    print("DL RATE "+str(qos['dl_rat_kb'])+"kbps")
-    #print("LOSSES "+str(qos['dl_los'])+"%")
-    return qos

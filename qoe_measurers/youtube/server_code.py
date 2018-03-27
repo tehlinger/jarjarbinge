@@ -70,6 +70,7 @@ def MakeHandlerClassFromArgv(init_args):
                     y = 150
                     click(x,y,button='right')
                     #time.sleep(1)
+                    #click(x,y,button='right')
                     time.sleep(0.1)
                     moveRel(15,222)
                     click()
