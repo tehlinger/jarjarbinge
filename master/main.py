@@ -22,10 +22,10 @@ HOST_NAME="127.0.0.1"
 #DB_IP = '138.96.65.33/acqua-db'
 DB_IP = 'localhost'
 PORT_NUMBER = 8000
-EXP_NAME = 'v2_43b'
-EXP_NAME = 'useless'
+EXP_NAME = 'v300b'
+#EXP_NAME = 'useless'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
-ALLWAYS_CLEAN_QOS=True
+ALLWAYS_CLEAN_QOS=False
 
 def main(fault_tolerant=True):
     """Launches experiment until Ctrl+C"""

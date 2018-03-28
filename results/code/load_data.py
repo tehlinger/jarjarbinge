@@ -22,7 +22,9 @@ V2_RESULT_FILES = [
         "../data/v2/biais_A_v2_42_clean.json",
         "../data/v2/biais_B_v2_4_clean.json",
         "../data/v2/biais_B_v2_41_clean.json",
-        "../data/v2/biais_B_v2_42_clean.json"
+        "../data/v2/biais_B_v2_42_clean.json",
+        "../data/v2/v300b_A_clean.json",
+        "../data/v2/v300b_B_clean.json"
         ]
 
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
@@ -31,16 +33,14 @@ def load_col_names(f):
     with open(f,'r') as f :
         return f.readline()[:-1].split(',')
 
-def compare_pcs(filenames=V2_RESULT_FILES,\
-        a_indexes=[1,2],\
-        b_indexes=[4,5]):
+def compare_pcs(filenames=V2_RESULT_FILES):
     """
     indexes : indexes of the filenames of each computer
     """
-    a_files = [filenames[i] for i in a_indexes]
+    a_files = [f for f in filenames if "A" in f]
     a_df = load_csv(False,a_files)
     add_mean_mos(a_df)
-    b_files = [filenames[i] for i in b_indexes]
+    b_files = [f for f in filenames if "B" in f]
     b_df = load_csv(False,b_files)
     add_mean_mos(b_df)
     return {"a":a_df,"b":b_df}

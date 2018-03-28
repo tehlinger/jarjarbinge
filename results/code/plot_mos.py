@@ -50,7 +50,7 @@ def by_vid_mos(df,mos_field="MOS",split_vids=True):
     else:
         mos_cdf(df,mos_field)
 
-def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"],\
+def plot_all_mos(df,must_show,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"],\
         legend=None):
     sns.set()
     n = df.shape[0]
@@ -63,13 +63,14 @@ def plot_all_mos(df,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"],\
     ax.yaxis.set_major_formatter(ticker.ScalarFormatter())
     plt.xlabel("MOS",fontsize=18)
     plt.ylabel("Distribution",fontsize=18)
-    #plt.show()
+    if must_show:
+        plt.show()
 
 def compare_MOS(a_df,b_df,df):
     headers = ["MOS"]
-    plot_all_mos(a_df,["MOS"],legend="computer A")
-    plot_all_mos(b_df,["MOS"],legend="computer B")
-    plot_all_mos(df,["MOS"],legend="Both")
+    plot_all_mos(a_df,False,["MOS"],legend="computer A")
+    plot_all_mos(b_df,False,["MOS"],legend="computer B")
+    plot_all_mos(df,False,["MOS"],legend="Both")
     n = a_df.shape[0]+b_df.shape[0]
     plt.title("MOS for each computer ("+str(n)+" points)",fontsize=22)
     plt.show()
