@@ -22,18 +22,20 @@ HOST_NAME="127.0.0.1"
 #DB_IP = '138.96.65.33/acqua-db'
 DB_IP = 'localhost'
 PORT_NUMBER = 8000
-EXP_NAME = 'v310b'
-#EXP_NAME = 'useless'
+EXP_NAME = 'v400r'
+EXP_NAME = 'useless'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
 ALLWAYS_CLEAN_QOS=False
+REALISTIC_DATA=True
 
 def main(fault_tolerant=True):
     """Launches experiment until Ctrl+C"""
     server_class = server_code.StoppableHttpServer
+    qos_selector = QosSelector()
     not_interrupted = True
     while not_interrupted:
         try:
-            launch_one_experiment()
+            launch_one_experiment(qos_selector)
         except KeyboardInterrupt:
             not_interrupted=False
         except Exception as e:
@@ -42,8 +44,9 @@ def main(fault_tolerant=True):
             else:
                 raise e
 
-def launch_one_experiment(verbose=True):
-    qos = get_QoS(verbose=verbose)
+def launch_one_experiment(qos_selector,verbose=True):
+    with_realistic_data = REALISTIC_DATA
+    qos = get_QoS(qos_selector,with_realistic_data,verbose=verbose)
     send_qos_to_traffic_controller(qos)
     send_go_to_qoe_measurer()
     qoe_results =\
@@ -103,9 +106,11 @@ def send_clear_to_tc():
     qos_response  = r.content.decode('utf-8')
     qos_response  = json.loads(r.content.decode('utf-8'))
 
-def get_QoS(verbose=True,clear_qos_only=ALLWAYS_CLEAN_QOS):
-    qos_selector = QosSelector(10)
-    qos = qos_selector.random_point(proba_clear_m=P)
+def get_QoS(qos_selector,realistic_data,verbose=True,clear_qos_only=ALLWAYS_CLEAN_QOS):
+    if not realistic_data :
+        qos = qos_selector.random_point(proba_clear_m=P)
+    else:
+        qos = qos_selector.random_real_point()
     #Following are line to get a static qos conf
     if clear_qos_only:
         qos = QosSelector.get_clear_qos()

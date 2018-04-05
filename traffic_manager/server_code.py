@@ -54,10 +54,11 @@ def MakeHandlerClassFromArgv(init_args):
             """Converts all the values of the param_dict to floats"""
             cond_dict = self.get_params().copy()
             for k in cond_dict.keys():
-                if 'rat' in k:
-                    cond_dict[k] = int(cond_dict[k][0])
-                else:
-                    cond_dict[k] = float(cond_dict[k][0])
+                if 'type' not in k:
+                    if 'rat' in k:
+                        cond_dict[k] = int(cond_dict[k][0])
+                    else:
+                        cond_dict[k] = float(cond_dict[k][0])
             return cond_dict
 
         def get_params(self):

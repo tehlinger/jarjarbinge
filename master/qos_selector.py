@@ -51,7 +51,8 @@ class QosSelector:
                 {'dl_los':dl_los , 'dl_del_ms':delays[0],
                     'ul_rat_kb': ul_rat_kb , 'ul_jit_ms': ul_jit_ms,
                     'ul_del_ms': delays[1],'dl_rat_kb': dl_rat_kb,
-                    'dl_jit_ms': dl_jit_ms, 'ul_los':ul_los}
+                    'dl_jit_ms': dl_jit_ms, 'ul_los':ul_los,
+                    'conn_type': entry["CONNECTION_TYPE"].values[0]}
 
     def formatted(self,entry,key):
         return round(float(entry[key]))
