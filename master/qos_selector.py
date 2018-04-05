@@ -22,6 +22,7 @@ class QosSelector:
                         'dl_jit_ms': [0,300], 'ul_los': [0,21]}
         self.pts_per_metric = pts_per_metric
         self.points = self.generate_points()
+        self.real_data = pd.read_csv("realistic_data.csv")
 
     def simulate(self,n,p=0):
         l = [self.random_point(proba_clear_m=p) for i in range(0,n)]
@@ -36,6 +37,29 @@ class QosSelector:
             result[metric] = \
                     [i for i in range(inf,sup,int((sup-inf)/n))]
         return result
+
+    def random_real_point(self):
+        entry = self.real_data.sample(n=1)
+        delays = self.get_delays_out_of_entry(entry)
+        ul_rat_kb = self.formatted(entry,"UDP_UPLOAD_THROUGHPUT")
+        dl_rat_kb = self.formatted(entry,"UDP_DOWNLOAD_THROUGHPUT")
+        ul_jit_ms = self.formatted(entry,"UPLOAD_JITTER")
+        dl_jit_ms = self.formatted(entry,"DOWNLOAD_JITTER")
+        ul_los    = self.formatted(entry,"UPLOAD_LOSS_RATE")
+        dl_los    = self.formatted(entry,"DOWNLOAD_LOSS_RATE")
+        return \
+                {'dl_los':dl_los , 'dl_del_ms':delays[0],
+                    'ul_rat_kb': ul_rat_kb , 'ul_jit_ms': ul_jit_ms,
+                    'ul_del_ms': delays[1],'dl_rat_kb': dl_rat_kb,
+                    'dl_jit_ms': dl_jit_ms, 'ul_los':ul_los}
+
+    def formatted(self,entry,key):
+        return round(float(entry[key]))
+
+    def get_delays_out_of_entry(self,entry):
+        RTT = round(float(entry["RTT"]))
+        RTT_split = random.randint(0,RTT)
+        return (RTT_split,RTT-RTT_split)
 
     def random_point(self,proba_clear_m=0,N=8):
         result = {}

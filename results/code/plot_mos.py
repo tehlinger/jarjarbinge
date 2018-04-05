@@ -1,11 +1,14 @@
 import array
 import matplotlib.ticker as ticker
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import pandas as pd
 import numpy as np
 import seaborn as sns
 from numpy import reshape
 import math
+import datetime
+import time
 
 ids = [
     "bUhdSs0VK9c",
@@ -56,7 +59,7 @@ def plot_all_mos(df,must_show,headers = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_he
     n = df.shape[0]
     for h in headers:
         mos_cdf(df,h,legend)
-    #plt.title("MOS for each codec ("+str(n)+" points)",fontsize=22)
+    plt.title("MOS for each codec ("+str(n)+" points)",fontsize=22)
     plt.legend(fontsize=18)
     ax = plt.gca()
     ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
@@ -99,3 +102,38 @@ def violins(df):
             fontsize=20)
     plt.show()
 
+def plt_mos_in_time_ab(dic):
+    sns.set()
+    plt_mos_in_time(dic['a'],"Computer A")
+    plt_mos_in_time(dic['b'],"Computer B")
+    plt.suptitle("Moving average of MOS (3 hours)",fontsize=20)
+    formatter = FuncFormatter(currency)
+    plt.gca().xaxis.set_major_formatter(formatter)
+    plt.legend(fontsize=16)
+    plt.xlabel("Time of the day",fontsize=18)
+    plt.ylabel("MOS (moving average)",fontsize=18)
+    plt.show()
+
+
+def plt_mos_in_time(df,legend,from_d=datetime.datetime(2018,3,29,12)):
+    df = df.loc[~pd.isnull(df.MOS)]
+    df = df_with_datetimes(df)
+    df = df.loc[df.date > from_d]
+    X = df.date
+    X = df.date.apply(lambda x :(x -datetime.datetime(1970,1,1)).total_seconds())
+    Y = np.array(df.MOS)
+    Y = moving_average(Y,120)
+    plt.plot(X,Y,label=legend)
+    plt.xticks(np.arange(min(X), max(X)+1, 6*3600))
+
+def currency(x, pos):
+    return time.strftime('%H:%M', time.localtime(x))
+
+def moving_average(a, n=3) :
+    return np.convolve(np.array(list(a)), np.ones((n,))/n, mode='same')
+
+def df_with_datetimes(df):
+    result = df.copy()
+    result["date"]=result.apply(lambda x : \
+            datetime.datetime.strptime('2018/'+x.date,'%Y/%d/%m-%H:%M'),axis=1)
+    return result

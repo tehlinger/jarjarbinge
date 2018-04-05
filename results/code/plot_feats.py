@@ -3,12 +3,32 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import math
 
-def plot_random_est_rates(df,n_samples,width=3):
+from load_data import load_MOS
+from get_features import get_feats_for_ml_only,launched_vid
+
+def get_data_for_feat_plots(with_est_rate=True):
+    df = launched_vid(load_MOS())
+    if with_est_rate:
+        df = df.loc[~pd.isnull(df.est_rates)]
+    return get_feats_for_ml_only(df,\
+            with_est_rate=with_est_rate)
+
+def plot_scatter(x,y,df,style=None):
     sns.set()
-    df = df.loc[(~pd.isnull(df.est_rates))]
-    df = df.loc[df.dl_rat_kb < 8000]
-    df['len'] = df.est_rates.apply(lambda x : len(x))
-    df = df.loc[df.len > 20]
+    if style is None:
+        sns.jointplot(df[x],df[y])
+    else:
+        sns.jointplot(df[x],df[y],style)
+    plt.show()
+
+def plot_random_est_rates(df,n_samples,width=3):
+    if "est_rate_max" not in df.columns:
+        raise ValueError("Est_rates features not in df."+\
+                "Try using add_app_features(df) or "+\
+                "add_app_features(df)")
+    sns.set()
+    df = df.loc[(~pd.isnull(df.est_rat_med))]
+    df = df.loc[(df.stall_n) >1 & (df.stall_tot > 10)]
     samples = df.sample(n_samples)
     print(samples.shape)
     n_rows = math.ceil(n_samples/width)

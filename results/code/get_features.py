@@ -21,19 +21,27 @@ def build_binary_dataset(df):
     return result[l]
 
 
-def get_feats_for_ml_only(df,exclude_qos=False):
+def get_feats_for_ml_only(df,\
+        exclude_qos=False,excluded_cols=[],with_est_rate=False):
     df = launched_vid(df)
     df = add_RTT(df)
     to_exclude = set(qos_metrics) if exclude_qos else set()
+    excluded_cols = set(excluded_cols)
     res = df[list(set(df.columns)-to_exclude\
             -set(["date","video_id","n","dur","_id"])
+            -excluded_cols
             -set(["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]))]
     res = add_app_features(res)
+    if with_est_rate:
+        res = add_est_rate_feat(res)
+    res = res.loc[~pd.isnull(res.MOS)]
     res = with_categorized_res(res)
     return\
             res[list(set(res.columns)\
             -set(['true_resolutions','totalStallDuration','stallingInfo',\
-            "getVideoLoadedFraction"]))]
+            "getVideoLoadedFraction",\
+            "est_rates"\
+            ]))]
 
 def meas_per_mos(df):
     if "MOS" not in df.columns:
@@ -72,6 +80,20 @@ def add_app_features(df):
     df = add_res_feat(df)
     return df
 
+def add_est_rate_feat(df):
+    result = df.copy()
+    result[["est_rate_max","est_rate_min","est_rat_med",\
+            "est_rate_integral"]] =\
+            df.est_rates.apply(extract_est_rates_info)
+    result["available_integral"] = \
+            result.apply(lambda x : x.dl_rat_kb * x.end_time,axis=1)
+    result["left_int"] = result.apply(\
+            lambda x :  x.available_integral - x.est_rate_integral,\
+            axis=1)
+    result["rat_needed"] = result.apply(\
+            lambda x : x["est_rate_integral"]/x["end_time"],axis=1)
+    return result
+
 def add_stalling_feat(df):
     result = df.copy()
     result[["stall_tot","stall_n","stall_max"]] = \
@@ -93,7 +115,10 @@ def extract_est_rates_info(est_rate_dic):
     if not isinstance(est_rate_dic,list):
         return pd.Series((0))
     else:
-        return pd.Series(len(est_rate_dic))
+        values=[i["res"] for i in est_rate_dic]
+        integral = integrate_est_rates(est_rate_dic)
+        return pd.Series((max(values),min(values),np.median(values),\
+                integral))
 
 def extract_stall_info(stall_dic):
     """
@@ -160,3 +185,14 @@ def get_yt_res(yt_str):
     returns 720 (for 720p)
     """
     return int(yt_str.split('x')[1].split('@')[0])
+
+def integrate_est_rates(res_dic):
+    l = [(i["res"],i["ts"]) for i in res_dic]
+    prev_time = 0
+    sum_rate = 0
+    for(res,ts) in l:
+        delta = ts - prev_time
+        sum_rate += delta * res
+        prev_time = ts
+    return sum_rate
+

@@ -20,11 +20,13 @@ V2_RESULT_FILES = [
         "../data/v2/biais_A_v2_4_clean.json",
         "../data/v2/biais_A_v2_41_clean.json",
         "../data/v2/biais_A_v2_42_clean.json",
-        "../data/v2/biais_B_v2_4_clean.json",
-        "../data/v2/biais_B_v2_41_clean.json",
-        "../data/v2/biais_B_v2_42_clean.json",
+        #"../data/v2/biais_B_v2_4_clean.json",
+        #"../data/v2/biais_B_v2_41_clean.json",
+        #"../data/v2/biais_B_v2_42_clean.json",
         "../data/v2/v300b_A_clean.json",
-        "../data/v2/v300b_B_clean.json"
+        #"../data/v2/v300b_B_clean.json",
+        "../data/v2/v310b_A_clean.json",
+        #"../data/v2/v310b_B_clean.json"
         ]
 
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
@@ -57,7 +59,7 @@ def check_files():
         print(f.split('/')[-1].split('.')[0][-12:]\
                 +":"+"n="+str(len(a)).zfill(4)+" i="+str(t))
 
-def load_results(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
+def load_results(files,header_file : 'file_path' =
         '../data/header.txt'):
     is_csv = "csv" in files[0]
     df = load_csv(is_csv,files,header_file)
@@ -77,6 +79,7 @@ def load_csv(is_csv,files=V1_RESULT_FILES,\
             result = result.append(df)
         else:
             result = df
+        print("File : "+str(fp)+"-"+str(df.shape)+" entries.")
     return result
 
 def export_for_ml(df,output):
@@ -86,8 +89,7 @@ def export_for_ml(df,output):
     df.to_csv(output,columns=out_cols,index=False)
 
 
-def load_MOS(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
-        '../data/header_mos.txt'):
+def load_MOS(files=V2_RESULT_FILES,header_file : 'file_path' = '../data/header_mos.txt'):
     df = load_triple_MOS(files,header_file)
     add_mean_mos(df)
     df.loc[df.join_time == 310000,"MOS"] = 1
@@ -95,7 +97,7 @@ def load_MOS(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
     df.at[pd.isnull(df.true_resolutions),"true_resolutions"] = None
     return df
 
-def load_triple_MOS(files : 'str_list'=V2_RESULT_FILES,header_file : 'file_path' =
+def load_triple_MOS(files,header_file : 'file_path' =
         '../data/header.txt'):
     df = load_results(files,header_file)
     for mos in ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]:
