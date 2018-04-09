@@ -9,6 +9,7 @@ import requests
 import urllib3
 import server_code
 import sys
+from subprocess import call
 
 from qos_selector import *
 from config_loader import *
@@ -23,7 +24,7 @@ HOST_NAME="127.0.0.1"
 DB_IP = 'localhost'
 PORT_NUMBER = 8000
 EXP_NAME = 'v400r'
-EXP_NAME = 'useless'
+#EXP_NAME = 'useless'
 RESULTS_FILE = "../results/"+EXP_NAME+".csv"
 ALLWAYS_CLEAN_QOS=False
 REALISTIC_DATA=True
@@ -33,6 +34,7 @@ def main(fault_tolerant=True):
     server_class = server_code.StoppableHttpServer
     qos_selector = QosSelector()
     not_interrupted = True
+    i = 0
     while not_interrupted:
         try:
             launch_one_experiment(qos_selector)

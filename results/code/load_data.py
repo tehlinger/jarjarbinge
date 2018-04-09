@@ -29,6 +29,10 @@ V2_RESULT_FILES = [
         #"../data/v2/v310b_B_clean.json"
         ]
 
+REALIST_RESULTS = [
+        "../data/v2/v400r_A_clean.json"
+        ]
+
 MOS_HEADERS = ["MOS_mp2","MOS_ac3","MOS_aaclc","MOS_heaac"]
 
 def load_col_names(f):
