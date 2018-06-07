@@ -63,7 +63,10 @@ ids = [
     "O3zza3ofZ0Q",
     "oFkulzWMotY",
     "RSzD92Rl8j4",
-    "tSjhLFWj9TU"
+    "tSjhLFWj9TU",
+    "6tz1_znrbmc",
+    "DcBU57z7CpY",
+    "aVtO8uQrPXc"
     ]
 
 for i in ids:

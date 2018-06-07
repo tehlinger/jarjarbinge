@@ -6,6 +6,18 @@ import math
 from load_data import load_MOS
 from get_features import get_feats_for_ml_only,launched_vid
 
+def plot_mos_depending_on(feats_df,metric_1,metric_2=None):
+    if metric_2 is None:
+        metric_2 = "MOS"
+    df = feats_df.copy()
+    df = df.sort_values(metric_2).reset_index()
+    x = df[metric_1]
+    y = df[metric_2]
+    sns.set()
+    plt.xlim([0,10000])
+    plt.scatter(x,y)
+    plt.show()
+
 def get_data_for_feat_plots(with_est_rate=True):
     df = launched_vid(load_MOS())
     if with_est_rate:

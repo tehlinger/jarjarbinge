@@ -1,8 +1,10 @@
 var tabId = parseInt(window.location.search.substring(1));
 //document.getElementById("demo").innerHTML+=window.location.search.substring(1);
 var LOAD_LIMIT  = 30000
+var TOTAL_PLAYING_LIMIT  = 30000
+var ALLOWED_STALLING = 30
+var TIME_TO_PLAY=45
 var stallingInfo = []
-var JOIN_LIMIT  = 30000
 var filters = { urls: ["<all_urls>"], tabId: -1 }
 var httpInfo="";
 var bitrate_switch=0; var bitrateSwitches = []
@@ -24,7 +26,8 @@ function json_stall_str(player,lastStallDuration){
 	}
 
 function json_bswitches_str(player){
-	return '{"ts" :'+player.getCurrentTime()+",'quality':"+player.setPlaybackQuality()+"}";
+	x = '{"ts" :'+player.getCurrentTime()+",'quality':"+player.setPlaybackQuality()+"}"
+	return x;
 	}
 
 chrome.runtime.onMessage.addListener(
@@ -34,10 +37,12 @@ chrome.runtime.onMessage.addListener(
 	    ts = player.getCurrentTime()
 	    if(request.cmd == "new_res"){
 	    	true_resolutions.push(JSON.stringify(request.res));
+		//console.log(JSON.stringify(request.res))
 	    }
 	    else{
 		dic = {"res":request.res,"ts":ts}
 		est_rates.push(JSON.stringify(dic));
+		//console.log(JSON.stringify(dic))
 	    }
     } else {
       //console.log("wrong cmd :"+request.cmd)
@@ -196,10 +201,12 @@ function getVideo(){
             //window.close();
             if (videoID!="WAIT"){
                 player = new YT.Player('player', {
-                    height: '390',
-                    width: '640',
-                    //height: '720',
-                    //width: '1280',
+                    //height: '390',
+                    //width: '640',
+                    //height: '600',
+                    //width: '980',
+                    height: '720',
+                    width: '1280',
                     videoId: videoID,
                     events: {
                     'onReady': onPlayerReady,
@@ -286,6 +293,9 @@ var date = new Date().getTime();
 
 document.getElementById("demo").innerHTML+=join_time+","+date+",event.data = "+event.data+"<br>";
 if (event.data == YT.PlayerState.PLAYING) {
+if (player.getCurrentTime() >= TIME_TO_PLAY){
+    sendVideoInfo("videoEnded");
+}
 	document.getElementById("demo").innerHTML+="Playing "+player.getAvailableQualityLevels()+" "+player.getPlaybackQuality()+" "+"<br>";
 
 	availableQualityLevels=player.getAvailableQualityLevels();
@@ -314,7 +324,6 @@ if (event.data == YT.PlayerState.PLAYING) {
     }
 }
 if (event.data == YT.PlayerState.BUFFERING) {
-    
     //setTimeout(stopVideo, 6000);
     //done = true;
 	bufferingStart=1;
@@ -329,9 +338,7 @@ if (event.data == YT.PlayerState.BUFFERING) {
 
 }
 if (event.data == YT.PlayerState.ENDED) {
-    
     sendVideoInfo("videoEnded");
-
 }
 if (event.data == -1){
 	if (bufferingStart==1){
@@ -344,6 +351,7 @@ if (event.data == -1){
 }
 var realtimeStallDur=0
 function checkBuffer(){
+
     //document.getElementById("demo").innerHTML+="ts_start_js="+ts_start_js+"&ts_onYTIframeAPIReady="+ts_onYTIframeAPIReady+"&ts_onPlayerReadyEvent="+ts_onPlayerReadyEvent+"&ts_firstBuffering="+ts_firstBuffering+"&ts_startPlaying="+ts_startPlaying+"&player_load_time="+player_load_time+"&join_time="+join_time+"&totalStallDuration="+totalStallDuration+"&stallingNumber="+stallingNumber+"&stallingInfo="+stallingInfo+"<br>";
     var ts=new Date().getTime();
     if (player_load_time==0) {
@@ -358,9 +366,9 @@ function checkBuffer(){
     }
     else if (join_time==0) {
         if (ts_firstBuffering>0){
-            var timeFromBufferingPlusplayerLoadTime=parseFloat(ts)-parseFloat(ts_firstBuffering)+player_load_time;
+            var timeFromBufferingPlusplayerLoadTime=parseFloat(ts)-parseFloat(ts_firstBuffering);//+player_load_time;
             var timeFromBuffering=parseFloat(ts)-parseFloat(ts_firstBuffering);
-            if (timeFromBuffering>JOIN_LIMIT){
+            if (timeFromBuffering>TOTAL_PLAYING_LIMIT){
                 sendVideoInfo("joinTimeHigh");
             }
             else{
@@ -372,6 +380,9 @@ function checkBuffer(){
         }
     }
     else if (ts_firstBuffering>0){
+	if (player.getCurrentTime() >= 45){
+	    sendVideoInfo("videoEnded");
+	}
         //document.getElementById("demo").innerHTML+="getVideoLoadedFraction="+player.getVideoLoadedFraction()+"<br>"
         //QoE=getITUQoE(stallingInfo,ts_startPlaying,videoDuration,stallingNumber);
         //QoE==1
@@ -382,8 +393,9 @@ function checkBuffer(){
             QoE=0;
         }
         if (
-		realtimeStallDur>10 ||
-		(player.getVideoLoadedFraction()>0.98)){// && player.getPlayerState()!=YT.PlayerState.ENDED)){
+		//realtimeStallDur>ALLOWED_STALLING ||
+		//(player.getVideoLoadedFraction()>0.98)){
+		(player.getPlayerState()==YT.PlayerState.ENDED)){
             sendVideoInfo("videoDownloaded");
         }
         else {

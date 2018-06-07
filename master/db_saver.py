@@ -3,14 +3,18 @@ import pprint
 import json
 import datetime
 
-def save_results(qoe_results,qos,exp_name,ip='localhost',must_format=True):
-    pprint.pprint(qoe_results)
+def save_results(qoe_results,qos,exp_name,dataset,ip='localhost',must_format=True):
+    """
+    Dataset : identify the dataset to wich this point belongs
+    """
+    #pprint.pprint(qoe_results)
     if must_format:
         clean_results(qoe_results)
-    d = datetime.datetime.now().strftime("%d/%m-%H:%M")
+    d = datetime.datetime.now().strftime("%d/%m-%H:%M:%S")
     results = {**qos,**qoe_results}
     results["date"] = d
-    pprint.pprint(results)
+    results["dataset"] = dataset
+    #pprint.pprint(results)
     c = get_collection(exp_name,ip)
     i = c.insert_one(results).inserted_id
     print("["+d+"] "+"host:"+str(ip)+"-id:"+str(i))
@@ -34,8 +38,8 @@ def format_entries(results):
             if k == "true_resolutions" or k == 'stallingInfo'\
                     or k == 'est_rates':
                 to_convert = str(results[k])
-                if k == 'est_rates':
-                    print("GOT IT : "+str(results[k]))
+                #if k == 'est_rates':
+                #    print("GOT IT : "+str(results[k]))
         if k == "video_id":
             results[k] = v[0]
 

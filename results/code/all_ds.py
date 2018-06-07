@@ -1,5 +1,8 @@
 from load_data import load_MOS
 
+BIG_2 = [
+        "../data/new_jitter/big_3.json"
+       ]
 BIG_1 = [
         #"../data/new_jitter/big_1.json",
         "../data/new_jitter/big_2.json"

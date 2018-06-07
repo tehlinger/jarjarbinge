@@ -21,6 +21,7 @@ def MakeHandlerClassFromArgv(init_args):
     class MyHandler(BaseHTTPRequestHandler):
 
         never_launched = True
+        dummy_vid = False
 
         def __init__(s,*args, **kwargs):
             super(MyHandler, s).__init__(*args, **kwargs)
@@ -32,6 +33,7 @@ def MakeHandlerClassFromArgv(init_args):
                 s.end_headers()
             else:
                 if path == '/go':
+                    MyHandler.dummy_vid = False
                     s.send_response(200)
                     s.send_header("Content-type","text/html")
                     s.end_headers()
@@ -39,16 +41,36 @@ def MakeHandlerClassFromArgv(init_args):
                         print("Launching experiment...")
                         launch_experiment(s.get_params())
                         MyHandler.never_launched = False
+                if path == '/go_clear':
+                    MyHandler.dummy_vid = True
+                    s.send_response(200)
+                    s.send_header("Content-type","text/html")
+                    s.end_headers()
+                    if MyHandler.never_launched:
+                        print("Launching experiment...")
+                        launch_experiment(s.get_params(),go_clear=True)
+                        MyHandler.never_launched = False
                 if path =="/getVideoID_Res":
                 #chrome extension (client) wants data
                 #on the video he must play
-                    vid_id = random.choice(["bUhdSs0VK9c",
-                        "im_2tkN4VKY",
-                        "O3zza3ofZ0Q",
-                        "oFkulzWMotY",
-                        "RSzD92Rl8j4",
-                        "tSjhLFWj9TU"
-                        ])
+                    #time.sleep(3)
+                    with open("tmp","r") as f:
+                        l = f.readlines()[0]
+                        if "real" in l:
+                           is_dummy = False
+                        else:
+                            is_dummy = True
+                    if is_dummy is not True:
+                        vid_id = random.choice(["bUhdSs0VK9c",
+                            "im_2tkN4VKY",
+                            "O3zza3ofZ0Q",
+                            "oFkulzWMotY",
+                            "RSzD92Rl8j4",
+                            "tSjhLFWj9TU"
+                            ])
+                    else:
+                        vid_id = "RK1K2bCg4J8"
+                    print("CHOSEN ID : "+vid_id)
                     s.send_response(200)
                     s.send_header("Access-Control-Allow-Origin","*")
                     s.send_header("videoID",vid_id)
@@ -72,7 +94,10 @@ def MakeHandlerClassFromArgv(init_args):
                     #time.sleep(1)
                     #click(x,y,button='right')
                     time.sleep(0.1)
-                    moveRel(15,222)
+                    #Previous player
+                    #moveRel(15,222)
+                    #HD dezoomed player
+                    moveRel(15,180)
                     click()
 
                 if path=="/configureQoS":

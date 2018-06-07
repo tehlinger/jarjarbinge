@@ -25,11 +25,11 @@ def revert_cmd(cmd):
     i = cmd.index("ffff:") + 1
     return result[:i]
 
-def set_rate(interface, tp_kb,burst_kb,limit_kb):
+def set_rate(interface, tp_kb,burst_kb,limit_kb,latency):
     CMD_LIST = \
             ["sudo", "tc", "qdisc", "add", "dev", interface, "root", "handle",
                     "1:", "tbf", "rate", str(tp_kb)+"kbit", "burst",
-            str(burst_kb)+"kbit", "limit", str(limit_kb)+"kbit"]
+            str(burst_kb)+"kbit", "limit", str(latency)+"ms"]
     return CMD_LIST
 
 def clean_int_cmd(interface):
@@ -99,7 +99,8 @@ def netem_cmd(is_up,net_cond):
         if dl:
             dl_cmd = ["delay",str(dl)+"ms"]
             if jit:
-                dl_cmd += [str(jit)+"ms","distribution","normal"]
+                dl_cmd += [str(jit)+"ms",\
+                        "distribution","normal","rate","100mbit"]
             result += dl_cmd
         if los:
             los_cmd = ["loss", str(los)+"%"]
@@ -118,10 +119,12 @@ def tbf_cmd(is_up,net_cond):
         result = ["tbf"]
         if is_up:
             rate  = net_cond["ul_rat_kb"]
+            latency = net_cond["ul_del_ms"]
         else:
             rate  = net_cond["dl_rat_kb"]
+            latency = net_cond["dl_del_ms"]
         return result +\
-                ["rate",str(rate)+"kbit","burst","50kbit","limit","1mbit"]
+                ["rate",str(rate)+"kbit","burst","50kbit","latency",str(latency)+"ms"]
     else:
         raise Exception('net_cond has no throuhput to implement')
 

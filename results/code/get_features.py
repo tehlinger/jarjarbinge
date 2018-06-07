@@ -2,10 +2,10 @@ import pandas as pd
 import numpy as np
 import math
 
-from load_data import load_results,load_MOS
+from load_data import load_results
 
 qos_metrics = ['dl_los', 'dl_del_ms', 'ul_rat_kb', 'ul_jit_ms',
-           'ul_del_ms','dl_rat_kb', 'dl_jit_ms', 'ul_los']
+           'ul_del_ms','dl_rat_kb', 'dl_jit_ms', 'ul_los','RTT']
 
 def build_binary_dataset(df):
     """
@@ -20,9 +20,15 @@ def build_binary_dataset(df):
     l = qos_metrics + ["LAUNCHED"]
     return result[l]
 
+def add_feats_to_ds(ds):
+    result = {}
+    for ds_name, df in ds:
+        result[ds_name] = get_feats_for_ml_only(df)
+    return result
 
 def get_feats_for_ml_only(df,\
-        exclude_qos=False,excluded_cols=[],with_est_rate=False):
+        exclude_qos=False,excluded_cols=[],with_est_rate=True,\
+        add_dummies=False):
     df = launched_vid(df)
     df = add_RTT(df)
     to_exclude = set(qos_metrics) if exclude_qos else set()
@@ -36,12 +42,22 @@ def get_feats_for_ml_only(df,\
         res = add_est_rate_feat(res)
     res = res.loc[~pd.isnull(res.MOS)]
     res = with_categorized_res(res)
+    if add_dummies:
+       res = one_col_per_res(res)
+       res = res.drop(columns=\
+               [i for i in res.columns if 'res' in i and \
+               len(i.split('_')) == 2])
     return\
             res[list(set(res.columns)\
             -set(['true_resolutions','totalStallDuration','stallingInfo',\
             "getVideoLoadedFraction",\
             "est_rates"\
             ]))]
+
+def one_col_per_res(df):
+    #res_dic = {0:'0',1:'144',2:'240',3:'360',4:'480',5:'720',6:'1080'}
+    res_cols = [i for i in df.columns if 'res_' in i]
+    return pd.get_dummies(df,columns=res_cols)
 
 def meas_per_mos(df):
     if "MOS" not in df.columns:
@@ -57,7 +73,7 @@ def launched_vid(df):
     return df.loc[df.join_time < 310000]
 
 def with_categorized_res(df,columns=["res_min","res_max","res_mod"]):
-    dic = {0:0,144:1,240:2,360:3,480:4,720:5}
+    dic = {0:0,144:1,240:2,360:3,480:4,720:5,1080:6}
     result = df.copy()
     for c in columns:
         result[c] = result.apply(lambda x : dic[int(x[c])],axis=1)
@@ -83,7 +99,7 @@ def add_app_features(df):
 def add_est_rate_feat(df):
     result = df.copy()
     result[["est_rate_max","est_rate_min","est_rat_med",\
-            "est_rate_integral"]] =\
+            "est_rate_integral","est_first","est_last"]] =\
             df.est_rates.apply(extract_est_rates_info)
     result["available_integral"] = \
             result.apply(lambda x : x.dl_rat_kb * x.end_time,axis=1)
@@ -96,14 +112,15 @@ def add_est_rate_feat(df):
 
 def add_stalling_feat(df):
     result = df.copy()
-    result[["stall_tot","stall_n","stall_max"]] = \
+    result[["stall_tot","stall_n","stall_max","stall_last_ts"]] = \
             df.stallingInfo.apply(extract_stall_info)
     return result
 
 def add_res_feat(df):
     result = df.copy()
     result[["switches_nb","switches_freq","res_min",\
-            "res_max","res_mod"]] = \
+            "res_max","res_mod","res_first","res_last_ts",\
+            "res_last","forlast_res","forlast_res_ts"]] = \
             df.apply(extract_res_info,axis=1)
     return result
 
@@ -116,9 +133,11 @@ def extract_est_rates_info(est_rate_dic):
         return pd.Series((0))
     else:
         values=[i["res"] for i in est_rate_dic]
+        first = values[0]
+        last = values[-1]
         integral = integrate_est_rates(est_rate_dic)
         return pd.Series((max(values),min(values),np.median(values),\
-                integral))
+                integral,first,last))
 
 def extract_stall_info(stall_dic):
     """
@@ -129,7 +148,8 @@ def extract_stall_info(stall_dic):
         return pd.Series((0,0,0))
     else:
         return pd.Series((sum([(i['duration']/1000) for i in stall_dic]),
-                len(stall_dic), max([(i['duration']/1000) for i in stall_dic])))
+                len(stall_dic), max([(i['duration']/1000) for i in stall_dic]),\
+                        stall_dic[-1]['ts']))
 
 def extract_res_info(entry):
     """Given an entry, returns
@@ -150,13 +170,27 @@ def extract_res_info(entry):
         if len(res_list) > 0:
             res_min = min([i[0] for i in res_list])
             res_max = max([i[0] for i in res_list])
+            res_first = res_list[0][0]
             res_mod = max(res_list,key= lambda x : x[1])[0]
+            last_change_ts = res_list[-1][1]
+            last_res = res_list[-1][0]
+            if len(res_list) > 1:
+                forlast_res = res_list[-2][0]
+                forlast_res_ts = res_list[-2][1]
+            else:
+                forlast_res = res_first
+                forlast_res_ts = 0
         else:
             res_min = 0
             res_max = 0
             res_mod = 0
+            last_change_ts = 0
+            last_res = "0x0"
+            forlast_res = "0x0"
+            forlast_res_ts = 0
         return pd.Series((switches_nb,switches_freq,\
-                res_min,res_max,res_mod))
+            res_min,res_max,res_mod,res_first,last_change_ts,\
+            last_res,forlast_res,forlast_res_ts))
 
 def get_res_list(of_interest,end_time):
     """
@@ -196,3 +230,6 @@ def integrate_est_rates(res_dic):
         prev_time = ts
     return sum_rate
 
+def show_res_ts():
+    df = get_feats_for_ml_only(load_MOS(["../data/new_jitter/test.json"]))
+    return df[["res_last_ts","res_last","forlast_res","forlast_res_ts"]]

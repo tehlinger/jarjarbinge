@@ -10,11 +10,14 @@ def analyze(df,prev_field="est_last",new_metric="est_first"):
     for ds_name,c in zip(df.dataset.unique(),colors):
         tmp_df = df.loc[df.dataset.str.match(ds_name)]
         plot_dependency(tmp_df,new_metric,c)
-    plt.xlabel("Previous rate")
-    plt.ylabel(new_metric.replace("_"," ").capitalize())
+    plt.xlabel("Previous rate",fontsize=26)
+    plt.ylabel(new_metric.replace("_"," ").capitalize(),fontsize=26)
     plt.legend()
-    plt.xlim([100,1e4])
-    plt.ylim([100,1e4])
+    plt.suptitle(\
+            "First connection speed of experiment n versus rate connection"+
+            "speed of experiment n+1",fontsize=30)
+    plt.xlim([0,1.3*1e4])
+    plt.ylim([0,1.3*1e4])
     #plt.xscale('log')
     #plt.loglog()
     plt.show()
@@ -82,3 +85,25 @@ def get_bin_info(df,metric,bin_size,min_n_per_bin):
     df_with_bin_size["bin_size"]=df_with_bin_size[0]
     df_with_bin_size.drop(columns=[0],inplace=True)
     return df_with_bin_size.loc[df_with_bin_size["bin_size"] >= min_n_per_bin]
+
+def plot_res_first_cdf(feats_df):
+    feats_df["quality"] = \
+            feats_df.apply(lambda x : "HD" if int(x["res_first"]) > 500 else \
+            "Medium" if int(x["res_first"]) > 300 else "Low",axis=1)
+    res_list = ["HD","Medium","Low"]
+    colors = ["g","xkcd:light orange","r"]
+    sns.set()
+    for res,c in zip(res_list,colors):
+        tmp_df = feats_df.loc[feats_df.quality.str.match(res)]
+        first_rates = sorted(list(tmp_df.est_first.values))[:-1]
+        n = len(first_rates)
+        y = [i/n for i in range(0,n)]
+        x = first_rates
+        plt.plot(x,y,label=res,linewidth=5,color=c)
+    plt.ylabel("CDF",fontsize=28)
+    plt.xlabel("First estimated rate",fontsize=28)
+    plt.suptitle(\
+            "For each resolution of the first frame of the measurements,\n"+\
+            "CDF of the first estimated connection speed",fontsize=30)
+    plt.legend(fontsize=30)
+    plt.show()

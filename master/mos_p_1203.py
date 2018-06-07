@@ -48,7 +48,7 @@ def prepare_json_for_mos(play_dic,video_id,audio_codec=None):
 
 def static_gen_entry():
     return {
-            "displaySize":"640x390",
+            "displaySize":"720x1280",
             "device":"pc",
             "viewingDistance":None
             }
